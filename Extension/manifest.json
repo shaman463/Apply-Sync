@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "ApplySync Job Saver",
+  "version": "1.0",
+  "description": "Extract job details from job websites and send to ApplySync dashboard.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": [
+    "*://*.indeed.com/*",
+    "*://*.linkedin.com/*",
+    "*://*.glassdoor.com/*",
+    "*://*.naukri.com/*"
+  ],
+  "action": {
+    "default_popup": "popUp.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.indeed.com/*",
+        "*://*.linkedin.com/*",
+        "*://*.glassdoor.com/*",
+        "*://*.naukri.com/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

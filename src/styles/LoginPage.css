@@ -1,0 +1,406 @@
+/* Login Page Container */
+.background-radial-gradient {
+  background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 50%, #1a2332 100%);
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  padding: 4rem 1rem;
+}
+
+/* Row Alignment */
+.login-row {
+  display: flex;
+  align-items: center;
+  min-height: calc(100vh - 8rem);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Left Column - Text Section */
+.login-text-section {
+  padding:  3rem;
+}
+
+.login-heading {
+  font-size: 3.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 2rem;
+  color: hsl(218, 81%, 95%);
+}
+
+.login-heading span {
+  color: hsl(218, 81%, 75%);
+}
+
+.login-subtext {
+  font-size: 1.125rem;
+  line-height: 1.75;
+  color: hsl(218, 81%, 85%);
+  opacity: 0.95;
+  max-width: 820px;
+}
+
+/* Right Column - Form Section */
+.login-form-section {
+  position: relative;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Gradient Circle Shapes */
+#radius-shape-1 {
+  height: 220px;
+  width: 220px;
+  top: -60px;
+  left: -25px;
+  background: radial-gradient(#a855f7, #c026d3);
+  overflow: hidden;
+  position: absolute;
+  border-radius: 50%;
+}
+
+#radius-shape-2 {
+  border-radius: 38% 62% 63% 37% / 70% 33% 67% 30%;
+  bottom: -60px;
+  right: -110px;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(#a855f7, #c026d3);
+  overflow: hidden;
+  position: absolute;
+}
+
+/* Glass Effect Card */
+.bg-glass {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border-radius: 1rem !important;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;
+  margin: 2.5rem 0 !important;
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 680px;
+}
+
+.login-card-body {
+  padding: 2.5rem !important;
+}
+
+/* Card Title */
+.login-card-title {
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+  color: #334155;
+}
+
+/* Alert Messages */
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.9375rem;
+  text-align: center;
+  animation: slideIn 0.3s ease-out;
+}
+
+.alert-success {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+}
+
+.alert-error {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Form Input Row */
+.form-name-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0;
+}
+
+.form-name-col {
+  flex: 1;
+}
+
+/* Form Input Styling */
+.form-outline {
+  margin-bottom: 1.5rem;
+}
+
+.form-outline .form-control {
+  background-color: #f5f5f5;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.875rem 1rem;
+  font-size: 0.9375rem;
+  transition: all 0.3s ease;
+  color: #1f2937;
+}
+
+.form-outline .form-control:focus {
+  background-color: white;
+  border-color: #4285f4;
+  box-shadow: 0 0 0 0.2rem rgba(66, 133, 244, 0.15);
+  outline: none;
+}
+
+.form-outline .form-control::placeholder {
+  color: #9ca3af;
+}
+
+.form-outline .form-label {
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.form-outline.mb-4 {
+  margin-bottom: 1.5rem !important;
+}
+
+/* Checkbox Section */
+.checkbox-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-check-input {
+  border-radius: 0.25rem;
+  border: 2px solid #d1d5db;
+  width: 1.25rem;
+  height: 1.25rem;
+  cursor: pointer;
+  margin: 0;
+}
+
+.form-check-input:checked {
+  background-color: #4285f4;
+  border-color: #4285f4;
+}
+
+.form-check-label {
+  color: #6b7280;
+  font-size: 0.9375rem;
+  margin: 0;
+  cursor: pointer;
+}
+
+/* Sign Up Button */
+.btn.w-100 {
+  width: 100% !important;
+}
+
+.btn.mb-4 {
+  margin-bottom: 1.5rem !important;
+}
+
+.login-btn {
+  width: 100%;
+  height: 48px;
+  background: linear-gradient(135deg, #4285f4 0%, #3367d6 100%);
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0 1.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(66, 133, 244, 0.4);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.login-btn:hover {
+  background: linear-gradient(135deg, #3367d6 0%, #2a56c6 100%);
+  box-shadow: 0 6px 16px rgba(66, 133, 244, 0.5);
+}
+
+.login-btn:active {
+  background: linear-gradient(135deg, #2a56c6 0%, #1e40af 100%);
+  box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);
+}
+
+.login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.login-btn:focus {
+  outline: none;
+  box-shadow: 0 4px 12px rgba(66, 133, 244, 0.4);
+}
+
+/* Social Login Section */
+.social-login-section {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.social-login-section p {
+  color: #6b7280;
+  font-size: 0.9375rem;
+  margin-bottom: 1.25rem;
+}
+
+.social-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  margin: 0 0.5rem;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  font-size: 1.25rem;
+  background-color: transparent;
+}
+
+.social-btn.facebook {
+  color: #3b5998;
+}
+
+.social-btn.facebook:hover {
+  background-color: rgba(59, 89, 152, 0.1);
+  transform: scale(1.1);
+}
+
+.social-btn.google {
+  color: #db4437;
+}
+
+.social-btn.google:hover {
+  background-color: rgba(219, 68, 55, 0.1);
+  transform: scale(1.1);
+}
+
+.social-btn.twitter {
+  color: #1da1f2;
+}
+
+.social-btn.twitter:hover {
+  background-color: rgba(29, 161, 242, 0.1);
+  transform: scale(1.1);
+}
+
+.social-btn.github {
+  color: #333;
+}
+
+.social-btn.github:hover {
+  background-color: rgba(51, 51, 51, 0.1);
+  transform: scale(1.1);
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  .login-heading {
+    font-size: 3rem;
+  }
+  
+  .login-text-section {
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-heading {
+    font-size: 2.5rem;
+    text-align: center;
+  }
+
+  .login-subtext {
+    text-align: center;
+    padding: 0 1rem;
+  }
+
+  .login-text-section {
+    padding: 2rem 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .background-radial-gradient {
+    padding: 2rem 1rem;
+  }
+
+  .login-row {
+    min-height: auto;
+  }
+
+  #radius-shape-1,
+  #radius-shape-2 {
+    display: none;
+  }
+
+  .bg-glass {
+    margin: 1rem 0 !important;
+  }
+
+  .login-card-body {
+    padding: 2rem !important;
+  }
+
+  .form-name-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .login-heading {
+    font-size: 2rem;
+  }
+
+  .login-subtext {
+    font-size: 1rem;
+  }
+
+  .social-btn {
+    width: 40px;
+    height: 40px;
+    margin: 0 0.25rem;
+    font-size: 1rem;
+  }
+
+  .login-card-body {
+    padding: 1.5rem !important;
+  }
+}
