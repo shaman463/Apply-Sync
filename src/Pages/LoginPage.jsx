@@ -28,6 +28,11 @@ const LoginPage = () => {
             localStorage.setItem("authToken", token);
             localStorage.setItem("userData", JSON.stringify(res.data.user));
             
+            // Dispatch custom event for extension (more reliable than storage event)
+            window.dispatchEvent(new CustomEvent('applysync-token-saved', {
+              detail: { token: token }
+            }));
+            
             // Store token in Chrome extension storage
             if (typeof chrome !== 'undefined' && chrome.runtime) {
                 chrome.runtime.sendMessage(
