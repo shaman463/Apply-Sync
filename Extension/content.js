@@ -1,5 +1,5 @@
 // This script extracts job info from job pages.
-// I’ll give you selectors for Indeed, LinkedIn, Glassdoor, and Naukri.
+console.log("Content script loaded on:", window.location.href);
 
 function extractJobDetails() {
   let job = {
@@ -10,6 +10,14 @@ function extractJobDetails() {
     description: "",
     url: window.location.href
   };
+
+  if (location.href.includes("internshala.com")) {
+    job.title = document.querySelector(".heading_4_5")?.innerText || document.querySelector("h1")?.innerText || "";
+    job.company = document.querySelector(".company_name")?.innerText || document.querySelector(".heading_4_5")?.parentElement?.querySelector("a")?.innerText || "";
+    job.location = document.querySelector(".location_link")?.innerText || "";
+    job.salary = document.querySelector(".heading_4")?.innerText || "";
+    job.description = document.querySelector(".job_description")?.innerText || document.querySelector("#job_description")?.innerText || "";
+  }
 
   if (location.href.includes("indeed.com")) {
     job.title = document.querySelector("h1")?.innerText || "";
@@ -95,8 +103,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === "extract_job") {
     try {
       const jobData = extractJobDetails();
+      console.log("Job data extracted:", jobData);
       sendResponse({ success: true, data: jobData });
     } catch (error) {
+      console.error("Error extracting job:", error);
       sendResponse({ success: false, error: error.message });
     }
   }
