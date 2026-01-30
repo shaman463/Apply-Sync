@@ -36,7 +36,20 @@ function SignUpPage() {
             });
 
             setMessage("Account created successfully ✓");
-            localStorage.setItem("authToken", res.data.token);
+            const token = res.data.token;
+            localStorage.setItem("authToken", token);
+            
+            // Store token in Chrome extension storage
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                chrome.runtime.sendMessage(
+                  { action: "saveToken", token: token },
+                  (response) => {
+                    if (response?.success) {
+                      console.log("Token saved to extension");
+                    }
+                  }
+                );
+            }
             
             // Redirect to dashboard after successful signup
             setTimeout(() => {

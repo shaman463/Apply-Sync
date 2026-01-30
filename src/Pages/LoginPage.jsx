@@ -24,8 +24,21 @@ const LoginPage = () => {
             });
 
             setMessage("Login successful ✓");
-            localStorage.setItem("authToken", res.data.token);
+            const token = res.data.token;
+            localStorage.setItem("authToken", token);
             localStorage.setItem("userData", JSON.stringify(res.data.user));
+            
+            // Store token in Chrome extension storage
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                chrome.runtime.sendMessage(
+                  { action: "saveToken", token: token },
+                  (response) => {
+                    if (response?.success) {
+                      console.log("Token saved to extension");
+                    }
+                  }
+                );
+            }
             
             // Redirect to dashboard after successful login
              setTimeout(() => navigate("/dashboard"), 800);

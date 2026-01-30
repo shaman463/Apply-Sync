@@ -5,6 +5,9 @@
   "description": "Extract job details from job websites and send to ApplySync dashboard.",
   "permissions": ["activeTab", "scripting", "storage"],
   "host_permissions": [
+    "http://localhost:5173/*",
+    "*://internshala.com/*",
+    "*://*.internshala.com/*",
     "*://*.indeed.com/*",
     "*://*.linkedin.com/*",
     "*://*.glassdoor.com/*",
@@ -17,12 +20,24 @@
     "*://*.angels.co/*",
     "*://*.wellfound.com/*"
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
     "default_popup": "popUp.html"
   },
   "content_scripts": [
     {
       "matches": [
+        "http://localhost:5173/*"
+      ],
+      "js": ["app-content.js"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "*://internshala.com/*",
+        "*://*.internshala.com/*",
         "*://*.indeed.com/*",
         "*://*.linkedin.com/*",
         "*://*.glassdoor.com/*",
