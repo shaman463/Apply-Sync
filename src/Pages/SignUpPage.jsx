@@ -39,6 +39,11 @@ function SignUpPage() {
             const token = res.data.token;
             localStorage.setItem("authToken", token);
             
+            // Dispatch custom event for extension (more reliable than storage event)
+            window.dispatchEvent(new CustomEvent('applysync-token-saved', {
+              detail: { token: token }
+            }));
+            
             // Store token in Chrome extension storage
             if (typeof chrome !== 'undefined' && chrome.runtime) {
                 chrome.runtime.sendMessage(
