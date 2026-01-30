@@ -1,6 +1,24 @@
 import User from '../model/user.js'
 import jwt from 'jsonwebtoken' // jwt is used for generating login tokens
 
+// Middleware to verify JWT token
+export const verifyToken = async (req, res, next) => {
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        
+        if (!token) {
+            return res.status(401).json({ message: "No token provided" });
+        }
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.userId = decoded.id;
+        next();
+    } catch (error) {
+        console.error("Token verification error:", error);
+        res.status(401).json({ message: "Invalid or expired token" });
+    }
+};
+
 export const loginUser = async (req, res) => {
     try {
         // whenever there is a post request is made from frontend
