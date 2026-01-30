@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        width: 300px;
+        padding: 15px;
+        font-family: Arial, sans-serif;
+      }
+      h3 {
+        margin: 0 0 15px 0;
+        color: #4285f4;
+      }
+      #saveJob {
+        width: 100%;
+        padding: 10px;
+        background: #4285f4;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+      }
+      #saveJob:hover {
+        background: #3367d6;
+      }
+      #saveJob:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+      #status {
+        margin-top: 10px;
+        font-size: 12px;
+        color: #666;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>Save Job to ApplySync</h3>
+    <button id="saveJob">Save Job</button>
+    <div id="status"></div>
+
+    <script src="popUp.js"></script>
+  </body>
+</html>
