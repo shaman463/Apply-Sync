@@ -1,6 +1,15 @@
-// This script extracts job info from job pages.
+// this page runs inside the job page itself.
+// meaning it has access to -----> document ,window.location.href ,Page DOM elements
+
+// Its only responsibility is to 
+// Extract job details from whichever job site you are visiting, and send them
+// back to the popup.console.log("Content script loaded on:", window.location.href);
+
 console.log("Content script loaded on:", window.location.href);
 
+// well this our main scraping function 
+// we initialize an job objext with empty fields and every site specific
+// block will find them
 function extractJobDetails() {
   let job = {
     title: "",
@@ -11,6 +20,8 @@ function extractJobDetails() {
     url: window.location.href
   };
 
+  // well everyone is smart here to understand here what is happeing 
+  // if not go to sleep
   if (location.href.includes("internshala.com")) {
     job.title = document.querySelector(".heading_4_5")?.innerText || document.querySelector("h1")?.innerText || "";
     job.company = document.querySelector(".company_name")?.innerText || document.querySelector(".heading_4_5")?.parentElement?.querySelector("a")?.innerText || "";
@@ -99,13 +110,16 @@ function extractJobDetails() {
   return job;
 }
 
+
+// At last we are sending data back to the popUp.js file
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === "extract_job") {
     try {
       const jobData = extractJobDetails();
       console.log("Job data extracted:", jobData);
       sendResponse({ success: true, data: jobData });
-    } catch (error) {
+    }
+    catch (error) {
       console.error("Error extracting job:", error);
       sendResponse({ success: false, error: error.message });
     }
