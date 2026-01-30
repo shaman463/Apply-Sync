@@ -40,6 +40,54 @@ function extractJobDetails() {
     job.description = document.querySelector(".dang-inner-html")?.innerText || "";
   }
 
+  if (location.href.includes("monster.com")) {
+    job.title = document.querySelector("h1[data-testid='svx-job-title']")?.innerText || document.querySelector("h1.title")?.innerText || "";
+    job.company = document.querySelector("[data-testid='svx-jobview-company-name']")?.innerText || document.querySelector(".company")?.innerText || "";
+    job.location = document.querySelector("[data-testid='svx-jobview-location']")?.innerText || document.querySelector(".location")?.innerText || "";
+    job.salary = document.querySelector("[data-testid='svx-jobview-salary']")?.innerText || "";
+    job.description = document.querySelector("[data-testid='svx-job-description-text']")?.innerText || document.querySelector(".job-description")?.innerText || "";
+  }
+
+  if (location.href.includes("ziprecruiter.com")) {
+    job.title = document.querySelector("h1.job_title")?.innerText || document.querySelector("h1")?.innerText || "";
+    job.company = document.querySelector("[itemprop='name']")?.innerText || document.querySelector(".hiring_company_text")?.innerText || "";
+    job.location = document.querySelector("[itemprop='addressLocality']")?.innerText || document.querySelector(".location")?.innerText || "";
+    job.salary = document.querySelector(".salary_range")?.innerText || "";
+    job.description = document.querySelector(".job_description")?.innerText || document.querySelector(".jobDescriptionSection")?.innerText || "";
+  }
+
+  if (location.href.includes("dice.com")) {
+    job.title = document.querySelector("h1[data-cy='jobTitle']")?.innerText || document.querySelector("h1.jobTitle")?.innerText || "";
+    job.company = document.querySelector("[data-cy='companyName']")?.innerText || document.querySelector(".employer")?.innerText || "";
+    job.location = document.querySelector("[data-cy='locationDetails']")?.innerText || document.querySelector(".location")?.innerText || "";
+    job.salary = document.querySelector(".salary")?.innerText || "";
+    job.description = document.querySelector("[data-cy='jobDescription']")?.innerText || document.querySelector(".job-description")?.innerText || "";
+  }
+
+  if (location.href.includes("simplyhired.com")) {
+    job.title = document.querySelector("h1.viewjob-jobTitle")?.innerText || document.querySelector("h1")?.innerText || "";
+    job.company = document.querySelector(".viewjob-companyName")?.innerText || document.querySelector(".company")?.innerText || "";
+    job.location = document.querySelector(".viewjob-location")?.innerText || document.querySelector(".location")?.innerText || "";
+    job.salary = document.querySelector(".viewjob-salary")?.innerText || "";
+    job.description = document.querySelector(".viewjob-description")?.innerText || document.querySelector(".job-description")?.innerText || "";
+  }
+
+  if (location.href.includes("careerbuilder.com")) {
+    job.title = document.querySelector("h1[data-testid='job-title']")?.innerText || document.querySelector(".job-title")?.innerText || "";
+    job.company = document.querySelector("[data-testid='company-name']")?.innerText || document.querySelector(".company-name")?.innerText || "";
+    job.location = document.querySelector("[data-testid='job-location']")?.innerText || document.querySelector(".job-location")?.innerText || "";
+    job.salary = document.querySelector("[data-testid='compensation']")?.innerText || "";
+    job.description = document.querySelector("[data-testid='job-description']")?.innerText || document.querySelector(".job-description")?.innerText || "";
+  }
+
+  if (location.href.includes("angels.co") || location.href.includes("wellfound.com")) {
+    job.title = document.querySelector("h1[data-test='JobDetail-title']")?.innerText || document.querySelector("h1")?.innerText || "";
+    job.company = document.querySelector("[data-test='StartupLink-title']")?.innerText || document.querySelector(".company-name")?.innerText || "";
+    job.location = document.querySelector("[data-test='JobDetail-location']")?.innerText || document.querySelector(".location")?.innerText || "";
+    job.salary = document.querySelector("[data-test='JobDetail-salary']")?.innerText || "";
+    job.description = document.querySelector("[data-test='JobDetail-description']")?.innerText || document.querySelector(".job-description")?.innerText || "";
+  }
+
   return job;
 }
 
