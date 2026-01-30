@@ -1,3 +1,9 @@
+# Environment Variables
+.env
+.env.local
+.env.*.local
+backend/.env
+
 # Logs
 logs
 *.log
@@ -7,18 +13,61 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
+node_modules/
+backend/node_modules/
+
+# Build Output
 dist
 dist-ssr
 *.local
+build/
+out/
 
-# Editor directories and files
+# IDE and Editor directories
 .vscode/*
 !.vscode/extensions.json
 .idea
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-workspace
+*.sublime-project
+
+# OS files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows files
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+Thumbs.db
+
+# macOS files
+.AppleDouble
+.LSOverride
+
+# Chrome Extension
+Extension/node_modules/
+Extension/dist/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Misc
+.cache/
+.temp/
+temp/
+tmp/
