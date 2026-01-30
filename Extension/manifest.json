@@ -8,7 +8,14 @@
     "*://*.indeed.com/*",
     "*://*.linkedin.com/*",
     "*://*.glassdoor.com/*",
-    "*://*.naukri.com/*"
+    "*://*.naukri.com/*",
+    "*://*.monster.com/*",
+    "*://*.ziprecruiter.com/*",
+    "*://*.dice.com/*",
+    "*://*.simplyhired.com/*",
+    "*://*.careerbuilder.com/*",
+    "*://*.angels.co/*",
+    "*://*.wellfound.com/*"
   ],
   "action": {
     "default_popup": "popUp.html"
@@ -19,7 +26,14 @@
         "*://*.indeed.com/*",
         "*://*.linkedin.com/*",
         "*://*.glassdoor.com/*",
-        "*://*.naukri.com/*"
+        "*://*.naukri.com/*",
+        "*://*.monster.com/*",
+        "*://*.ziprecruiter.com/*",
+        "*://*.dice.com/*",
+        "*://*.simplyhired.com/*",
+        "*://*.careerbuilder.com/*",
+        "*://*.angels.co/*",
+        "*://*.wellfound.com/*"
       ],
       "js": ["content.js"],
       "run_at": "document_idle"
