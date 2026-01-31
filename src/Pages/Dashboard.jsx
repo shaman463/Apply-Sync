@@ -1,31 +1,44 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 import "../styles/Dashboard.css";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [userName, setUserName] = useState("User");
   const [activeTab, setActiveTab] = useState("overview");
+  const [applications, setApplications] = useState([]);
+  const [isLoadingApps, setIsLoadingApps] = useState(false);
+  const [appsError, setAppsError] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
+    const fetchJobs = async () => {
+      const token = localStorage.getItem("authToken");
 
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        setUser(decoded);
-        // Try to get user data from localStorage if stored during signup
-        const storedUserData = localStorage.getItem("userData");
-        if (storedUserData) {
-          const userData = JSON.parse(storedUserData);
-          setUserName(userData.FirstName || userData.firstName || "User");
-        }
-      } catch (error) {
-        console.error("Invalid token:", error);
+      if (!token) {
+        setAppsError("Please log in to view applications.");
+        return;
       }
-    }
+
+      setIsLoadingApps(true);
+      setAppsError("");
+
+      try {
+        const res = await axios.get("http://localhost:5000/api/jobs", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setApplications(res.data?.jobs || []);
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+        setAppsError("Unable to load applications. Please try again.");
+      } finally {
+        setIsLoadingApps(false);
+      }
+    };
+
+    fetchJobs();
   }, []);
 
   const stats = [
@@ -33,49 +46,6 @@ const Dashboard = () => {
     { label: "Interviews", value: 8, icon: "🎤", color: "#764ba2" },
     { label: "Offers", value: 3, icon: "✨", color: "#f093fb" },
     { label: "Pending", value: 13, icon: "⏳", color: "#ffa400" },
-  ];
-
-  const recentApplications = [
-    {
-      id: 1,
-      company: "Google",
-      position: "Frontend Developer",
-      status: "Interview Scheduled",
-      date: "2026-01-28",
-      logo: "🔍"
-    },
-    {
-      id: 2,
-      company: "Microsoft",
-      position: "Full Stack Engineer",
-      status: "Shortlisted",
-      date: "2026-01-27",
-      logo: "🪟"
-    },
-    {
-      id: 3,
-      company: "Amazon",
-      position: "SDE",
-      status: "Applied",
-      date: "2026-01-26",
-      logo: "📦"
-    },
-    {
-      id: 4,
-      company: "Meta",
-      position: "React Developer",
-      status: "Applied",
-      date: "2026-01-25",
-      logo: "📘"
-    },
-    {
-      id: 5,
-      company: "Apple",
-      position: "iOS Developer",
-      status: "Rejected",
-      date: "2026-01-24",
-      logo: "🍎"
-    },
   ];
 
   const upcomingInterviews = [
@@ -104,20 +74,52 @@ const Dashboard = () => {
   };
 
   const getStatusColor = (status) => {
-    switch (status) {
-      case "Interview Scheduled":
+    const normalized = (status || "").toLowerCase();
+
+    switch (normalized) {
+      case "interview scheduled":
         return "#667eea";
-      case "Shortlisted":
+      case "shortlisted":
         return "#f093fb";
-      case "Applied":
+      case "applied":
         return "#4facfe";
-      case "Rejected":
+      case "rejected":
         return "#ef4444";
-      case "Offer":
+      case "offer":
+      case "offered":
         return "#10b981";
+      case "saved":
+        return "#6b7280";
       default:
         return "#6b7280";
     }
+  };
+
+  const formatStatusLabel = (status) => {
+    if (!status) return "Unknown";
+
+    return status
+      .toString()
+      .trim()
+      .split(/[_\s]+/)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
+  const formatDate = (value) => {
+    if (!value) return "—";
+
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) {
+      return value;
+    }
+
+    return parsed.toISOString().slice(0, 10);
+  };
+
+  const handleViewJob = (url) => {
+    if (!url) return;
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -198,21 +200,42 @@ const Dashboard = () => {
                   <div className="col">Date Applied</div>
                   <div className="col">Action</div>
                 </div>
-                {recentApplications.map((app) => (
-                  <div key={app.id} className="table-row">
-                    <div className="col">{app.logo} {app.company}</div>
-                    <div className="col">{app.position}</div>
+                {isLoadingApps && (
+                  <div className="table-row">
+                    <div className="col">Loading applications...</div>
+                  </div>
+                )}
+                {!isLoadingApps && appsError && (
+                  <div className="table-row">
+                    <div className="col">{appsError}</div>
+                  </div>
+                )}
+                {!isLoadingApps && !appsError && applications.length === 0 && (
+                  <div className="table-row">
+                    <div className="col">No applications saved yet.</div>
+                  </div>
+                )}
+                {!isLoadingApps && !appsError && applications.map((app) => (
+                  <div key={app._id || app.id} className="table-row">
+                    <div className="col">💼 {app.company || "—"}</div>
+                    <div className="col">{app.title || "—"}</div>
                     <div className="col">
                       <span 
                         className="status-badge"
                         style={{ backgroundColor: getStatusColor(app.status) }}
                       >
-                        {app.status}
+                        {formatStatusLabel(app.status)}
                       </span>
                     </div>
-                    <div className="col">{app.date}</div>
+                    <div className="col">{formatDate(app.appliedDate || app.savedAt)}</div>
                     <div className="col">
-                      <button className="action-btn">View</button>
+                      <button
+                        className="action-btn"
+                        onClick={() => handleViewJob(app.url)}
+                        disabled={!app.url}
+                      >
+                        View
+                      </button>
                     </div>
                   </div>
                 ))}

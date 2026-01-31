@@ -13,7 +13,8 @@ export const verifyToken = async (req, res, next) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.userId = decoded.id;
         next();
-    } catch (error) {
+    }
+    catch (error) {
         console.error("Token verification error:", error);
         res.status(401).json({ message: "Invalid or expired token" });
     }
@@ -62,19 +63,23 @@ export const loginUser = async (req, res) => {
     }
 };
 
+// to register an fucking user
 export const registerUser = async (req, res) => {
     try {
         const { FirstName, LastName, email, password } = req.body;
 
+        // Making sure all the field are filled in
         if (!FirstName || !LastName || !email || !password) {
             return res.status(400).json({ message: "All fields are required" });
         }
 
+        // if user already exists then show a message 
         const userExists = await User.findOne({ email });
         if (userExists) {
             return res.status(400).json({ message: "User already exists" });
         }
 
+        // make a user if everything is going great 
         const user = await User.create({
             FirstName: FirstName,
             LastName: LastName,
@@ -82,12 +87,14 @@ export const registerUser = async (req, res) => {
             password
         });
 
+        // create a jwt token or user creation 
         const token = jwt.sign(
             { id: user._id },
             process.env.JWT_SECRET,
             { expiresIn: "30D" }
         );
 
+        // show that user has been created
         res.status(201).json({
             message: "User Created Successfully",
             token,
@@ -97,7 +104,9 @@ export const registerUser = async (req, res) => {
                 email: user.email,
             },
         });
-    } catch (error) {
+    }
+    // catching some error if some idiot is trying something different
+     catch (error) {
         console.error(error);
 
         if (error.name === "ValidationError") {
