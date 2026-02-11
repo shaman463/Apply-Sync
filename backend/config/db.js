@@ -1,16 +1,19 @@
-import mongoose from "mongoose";
 import dotenv from "dotenv";
+import { PrismaClient } from "@prisma/client";
 
-dotenv.config(); // This is used to load the env variables inside this from .env file
+dotenv.config(); // Load env variables from .env
+
+const prisma = new PrismaClient();
 
 const connectDB = async () => {
     try {
-        const conn = await mongoose.connect(process.env.MONGO_URI);
-        console.log(`MongoDB Connected: ${conn.connection.host}`);
-    } catch (error) {
-        console.error("MongoDB connection FAILED 💀", error);
-        process.exit(1); // Stop the server if the server is not responding or working
+        await prisma.$connect();
+        console.log("PostgreSQL Connected");
+    }
+     catch (error) {
+        console.error("PostgreSQL connection FAILED 💀", error);
+        process.exit(1);
     }
 };
 
-export default connectDB;
+export { prisma, connectDB };

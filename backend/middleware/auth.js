@@ -1,4 +1,5 @@
-import User from '../model/user.js'
+import bcrypt from 'bcryptjs'
+import { prisma } from '../config/db.js'
 import jwt from 'jsonwebtoken' // jwt is used for generating login tokens
 
 // Middleware to verify JWT token
@@ -27,13 +28,13 @@ export const loginUser = async (req, res) => {
         const { email, password } = req.body;
 
         // Search for the email
-        const user = await User.findOne({ email }).select("+password");
+        const user = await prisma.user.findUnique({ where: { email } });
 
         if (!user) {
             return res.status(400).json({ message: "Invalid Email or Password" });
         }
 
-        const isMatch = await user.matchPassword(password);
+        const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
             return res.status(400).json({ message: "Invalid email or password" });
@@ -41,7 +42,7 @@ export const loginUser = async (req, res) => {
 
         // token is used here to tell or what proves that user is logged in
         const token = jwt.sign(
-            { id: user._id },
+            { id: user.id },
             process.env.JWT_SECRET,
             { expiresIn: "30D" }
         );
@@ -74,22 +75,27 @@ export const registerUser = async (req, res) => {
         }
 
         // if user already exists then show a message 
-        const userExists = await User.findOne({ email });
+        const userExists = await prisma.user.findUnique({ where: { email } });
         if (userExists) {
             return res.status(400).json({ message: "User already exists" });
         }
 
-        // make a user if everything is going great 
-        const user = await User.create({
-            FirstName: FirstName,
-            LastName: LastName,
-            email,
-            password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        // make a user if everything is going great
+        const user = await prisma.user.create({
+            data: {
+                FirstName: FirstName,
+                LastName: LastName,
+                email,
+                password: hashedPassword
+            }
         });
 
         // create a jwt token or user creation 
         const token = jwt.sign(
-            { id: user._id },
+            { id: user.id },
             process.env.JWT_SECRET,
             { expiresIn: "30D" }
         );
@@ -109,14 +115,8 @@ export const registerUser = async (req, res) => {
      catch (error) {
         console.error(error);
 
-        if (error.name === "ValidationError") {
-            const firstError = Object.values(error.errors)[0]?.message;
-            return res.status(400).json({ message: firstError || "Invalid input" });
-        }
-
-        if (error.code === 11000) {
-            const field = Object.keys(error.keyValue || {})[0] || "field";
-            return res.status(400).json({ message: `${field} already exists` });
+        if (error.code === "P2002") {
+            return res.status(400).json({ message: "Email already exists" });
         }
 
         res.status(500).json({ message: "Server error", details: error.message });

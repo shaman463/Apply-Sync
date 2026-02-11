@@ -30,10 +30,12 @@ const Dashboard = () => {
         });
 
         setApplications(res.data?.jobs || []);
-      } catch (error) {
+      } 
+      catch (error) {
         console.error("Error fetching jobs:", error);
         setAppsError("Unable to load applications. Please try again.");
-      } finally {
+      }
+       finally {
         setIsLoadingApps(false);
       }
     };
