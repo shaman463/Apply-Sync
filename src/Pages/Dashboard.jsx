@@ -178,8 +178,7 @@ const Dashboard = () => {
 
           <div className="nav-section">
             <h3>Settings</h3>
-            <button className="nav-link">⚙️ Profile</button>
-            <button className="nav-link">🔔 Notifications</button>
+            <button className="nav-link" onClick={() => navigate('/profile')}>⚙️ Profile</button>
             <button className="nav-link">📄 Resume</button>
           </div>
         </nav>

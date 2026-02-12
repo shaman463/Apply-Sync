@@ -1,16 +1,84 @@
-# React + Vite
+# ApplySync
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+ApplySync is a comprehensive job application management system that helps users track, organize, and manage job applications across multiple platforms in one centralized dashboard.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+ApplySync simplifies the entire job application process by allowing users to:
+- Extract job details from job websites using a Chrome extension
+- Track application statuses (saved, applied, rejected, offered)
+- Monitor interview schedules and deadlines
+- Manage profiles and application history
+- Sync data across all platforms seamlessly
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Frontend
+- **React 19** - UI framework
+- **Vite** - Build tool
+- **React Router** - Navigation
+- **Axios** - HTTP client
+- **MDB React UI Kit** - UI components
+- **TailwindCSS** - Styling
 
-## Expanding the ESLint configuration
+### Backend
+- **Node.js & Express** - Server framework
+- **PostgreSQL** - Database (via Neon)
+- **Prisma** - ORM
+- **JWT** - Authentication
+- **Google OAuth** - Social login
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Browser Extension
+- **Chrome Extension API** - Job extraction and token management
+
+## Features
+
+✅ User authentication (Email/Password & Google OAuth)  
+✅ Job Application Tracking with status management  
+✅ Chrome Extension for one-click job saving  
+✅ Dashboard with application overview & statistics  
+✅ Interview schedule management  
+✅ User profile management  
+✅ Protected routes and JWT-based authentication  
+
+## Getting Started
+
+### Prerequisites
+- Node.js 16+
+- PostgreSQL database (or Neon)
+- Google OAuth Client ID
+
+### Installation
+
+#### Frontend & Backend Setup
+```bash
+# Install dependencies
+npm install
+cd backend && npm install && cd ..
+
+#### Run Development Servers
+```bash
+# Terminal 1: Frontend (port 5173)
+npm run dev
+
+# Terminal 2: Backend (port 5000)
+cd backend && npm start
+```
+
+#### Install Chrome Extension
+1. Go to `chrome://extensions/`
+2. Enable "Developer mode"
+3. Click "Load unpacked"
+4. Select the `Extension/` folder
+
+
+## Contributing
+
+1. Create a feature branch
+2. Commit your changes
+3. Push to the repository
+4. Open a pull request
+
+## License
+
+ISC

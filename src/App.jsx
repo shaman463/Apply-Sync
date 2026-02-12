@@ -6,6 +6,7 @@ import Example from './components/Navbar';
 import LandingPage from './Pages/LandingPage';
 import ProtectedRoutes from './Services/ProtectedRoutes';
 import Dashboard from './Pages/Dashboard';
+import Profile from './Pages/Profile';
 
 function App() {
   const [count, setCount] = useState(0);
@@ -21,6 +22,8 @@ function App() {
 
         {/* Dashboard Protected  */}
         <Route path="/dashboard" element={<ProtectedRoutes> <Dashboard /> </ProtectedRoutes>}
+        />
+        <Route path="/profile" element={<ProtectedRoutes> <Profile /> </ProtectedRoutes>}
         />
       </Routes>
     </Router>
