@@ -1,6 +1,11 @@
 import bcrypt from 'bcryptjs'
+import crypto from 'crypto'
+import { OAuth2Client } from 'google-auth-library'
 import { prisma } from '../config/db.js'
 import jwt from 'jsonwebtoken' // jwt is used for generating login tokens
+
+const googleClientId = process.env.GOOGLE_CLIENT_ID || "";
+const googleClient = new OAuth2Client(googleClientId);
 
 // Middleware to verify JWT token
 export const verifyToken = async (req, res, next) => {
@@ -127,4 +132,68 @@ export const registerUser = async (req, res) => {
         res.status(500).json({ message: "Server error", details: error.message });
     }
 }
+
+export const googleLogin = async (req, res) => {
+    try {
+        const { credential } = req.body;
+
+        if (!credential) {
+            return res.status(400).json({ message: "Missing Google credential" });
+        }
+
+        if (!googleClientId) {
+            return res.status(500).json({ message: "Google client ID not configured" });
+        }
+
+        const ticket = await googleClient.verifyIdToken({
+            idToken: credential,
+            audience: googleClientId
+        });
+
+        const payload = ticket.getPayload();
+        const email = payload?.email;
+
+        if (!email) {
+            return res.status(400).json({ message: "Google account email not available" });
+        }
+
+        let user = await prisma.user.findUnique({ where: { email } });
+
+        if (!user) {
+            const randomPassword = crypto.randomBytes(32).toString("hex");
+            const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+            const FirstName = payload?.given_name || payload?.name?.split(" ")[0] || "Google";
+            const LastName = payload?.family_name || payload?.name?.split(" ").slice(1).join(" ") || "User";
+
+            user = await prisma.user.create({
+                data: {
+                    FirstName,
+                    LastName,
+                    email,
+                    password: hashedPassword
+                }
+            });
+        }
+
+        const token = jwt.sign(
+            { id: user.id },
+            process.env.JWT_SECRET,
+            { expiresIn: "30D" }
+        );
+
+        res.json({
+            message: "Login successful",
+            token,
+            user: {
+                FirstName: user.FirstName,
+                LastName: user.LastName,
+                email: user.email,
+            },
+        });
+    } catch (error) {
+        console.error("Google login error:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
 

@@ -116,36 +116,6 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section className="how-it-works">
-        <h2>How It Works</h2>
-        <div className="steps-container">
-          <div className="step">
-            <div className="step-number">1</div>
-            <h3>Post a Job</h3>
-            <p>Create and post your job openings in minutes</p>
-          </div>
-          <div className="step-arrow">→</div>
-          <div className="step">
-            <div className="step-number">2</div>
-            <h3>Get Applications</h3>
-            <p>Receive qualified applications automatically</p>
-          </div>
-          <div className="step-arrow">→</div>
-          <div className="step">
-            <div className="step-number">3</div>
-            <h3>Smart Screening</h3>
-            <p>AI filters and ranks the best candidates</p>
-          </div>
-          <div className="step-arrow">→</div>
-          <div className="step">
-            <div className="step-number">4</div>
-            <h3>Hire Top Talent</h3>
-            <p>Interview and hire your perfect match</p>
-          </div>
-        </div>
-      </section>
-
       {/* Features Section */}
       <section className="features">
         <div className="features-header">

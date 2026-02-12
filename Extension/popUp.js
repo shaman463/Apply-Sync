@@ -118,7 +118,7 @@ document.getElementById("saveJob").addEventListener("click", () => {
                 // if everything is ok then great the extension is working
                 // ofcourse it will work cause i have made it
                 if (apiResponse.ok) {
-                  statusDiv.textContent = "✓ Job saved successfully!";
+                  statusDiv.textContent = "Job saved successfully!";
                   statusDiv.style.color = "green";
                 }
                 // we are herr converting response to .text() to avoid JSON errors

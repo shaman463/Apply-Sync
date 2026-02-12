@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { MDBContainer, MDBRow, MDBCol, MDBCard, MDBCardBody, MDBInput, MDBIcon } from 'mdb-react-ui-kit';
+import { MDBContainer, MDBRow, MDBCol, MDBCard, MDBCardBody, MDBInput } from 'mdb-react-ui-kit';
 import '../styles/LoginPage.css';
 import { useNavigate } from "react-router-dom";
-
+import { GoogleLogin } from '@react-oauth/google';
 
 const LoginPage = () => {
     const [email, setEmail] = useState("");
@@ -11,6 +11,49 @@ const LoginPage = () => {
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+
+    const handleGoogleSuccess = async (credentialResponse) => {
+        try {
+            const credential = credentialResponse?.credential;
+            if (!credential) {
+                setMessage("Google sign-in failed. Please try again.");
+                return;
+            }
+
+            const res = await axios.post("http://localhost:5000/api/auth/google", {
+                credential
+            });
+
+            setMessage("Google login successful ✓");
+            const token = res.data.token;
+            localStorage.setItem("authToken", token);
+            localStorage.setItem("userData", JSON.stringify(res.data.user));
+
+            window.dispatchEvent(new CustomEvent('applysync-token-saved', {
+                detail: { token: token }
+            }));
+
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                chrome.runtime.sendMessage(
+                    { action: "saveToken", token: token },
+                    (response) => {
+                        if (response?.success) {
+                            console.log("Token saved to extension");
+                        }
+                    }
+                );
+            }
+
+            setTimeout(() => navigate("/dashboard"), 800);
+        } catch (err) {
+            console.error("Google sign-in error:", err);
+            setMessage(err.response?.data?.message || "Google sign-in failed. Please try again.");
+        }
+    };
+
+    const handleGoogleError = () => {
+        setMessage("Google sign-in failed. Please try again.");
+    };
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -27,26 +70,26 @@ const LoginPage = () => {
             const token = res.data.token;
             localStorage.setItem("authToken", token);
             localStorage.setItem("userData", JSON.stringify(res.data.user));
-            
+
             // Dispatch custom event for extension (more reliable than storage event)
             window.dispatchEvent(new CustomEvent('applysync-token-saved', {
-              detail: { token: token }
+                detail: { token: token }
             }));
-            
+
             // Store token in Chrome extension storage
             if (typeof chrome !== 'undefined' && chrome.runtime) {
                 chrome.runtime.sendMessage(
-                  { action: "saveToken", token: token },
-                  (response) => {
-                    if (response?.success) {
-                      console.log("Token saved to extension");
+                    { action: "saveToken", token: token },
+                    (response) => {
+                        if (response?.success) {
+                            console.log("Token saved to extension");
+                        }
                     }
-                  }
                 );
             }
-            
+
             // Redirect to dashboard after successful login
-             setTimeout(() => navigate("/dashboard"), 800);
+            setTimeout(() => navigate("/dashboard"), 800);
         } catch (err) {
             setMessage(err.response?.data?.message || "Login failed ❌");
         } finally {
@@ -80,7 +123,7 @@ const LoginPage = () => {
                     <MDBCard className='bg-glass'>
                         <MDBCardBody className='login-card-body'>
                             <h3 className='login-card-title'>Login</h3>
-                            
+
                             {message && (
                                 <div className={`alert ${message.includes('failed') || message.includes('❌') ? 'alert-error' : 'alert-success'}`}>
                                     {message}
@@ -88,27 +131,27 @@ const LoginPage = () => {
                             )}
 
                             <form onSubmit={handleLogin}>
-                                <MDBInput 
-                                    wrapperClass='mb-4' 
-                                    id='email' 
-                                    type='email' 
+                                <MDBInput
+                                    wrapperClass='mb-4'
+                                    id='email'
+                                    type='email'
                                     placeholder='Email'
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
                                 />
-                                
-                                <MDBInput 
-                                    wrapperClass='mb-4' 
-                                    placeholder='Password' 
-                                    id='password' 
+
+                                <MDBInput
+                                    wrapperClass='mb-4'
+                                    placeholder='Password'
+                                    id='password'
                                     type='password'
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
                                 />
 
-                                <button 
+                                <button
                                     type='submit'
                                     disabled={loading}
                                     className='login-btn'
@@ -119,22 +162,11 @@ const LoginPage = () => {
 
                             <div className="social-login-section">
                                 <p>or sign up with:</p>
-
-                                <button className='social-btn facebook'>
-                                    <MDBIcon fab icon='facebook-f' />
-                                </button>
-
-                                <button className='social-btn google'>
-                                    <MDBIcon fab icon='google' />
-                                </button>
-
-                                <button className='social-btn twitter'>
-                                    <MDBIcon fab icon='twitter' />
-                                </button>
-
-                                <button className='social-btn github'>
-                                    <MDBIcon fab icon='github' />
-                                </button>
+                                <GoogleLogin
+                                    onSuccess={handleGoogleSuccess}
+                                    onError={handleGoogleError}
+                                    useOneTap={false}
+                                />
                             </div>
                         </MDBCardBody>
                     </MDBCard>
