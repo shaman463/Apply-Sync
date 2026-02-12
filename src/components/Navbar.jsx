@@ -2,9 +2,12 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 import '../styles/Navbar.css';
+import { useNavigate } from "react-router-dom";
+
 
 export default function Navbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const navigate = useNavigate();
 
     const navigation = [
         { name: 'Home', href: '/' },
@@ -12,6 +15,12 @@ export default function Navbar() {
         { name: 'Services', href: '/services' },
         { name: 'Contact', href: '/contact' },
     ];
+
+    const handleLogout = () => {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("userData");
+        navigate("/");
+    };
 
     return (
         <nav className="navbar">
@@ -53,7 +62,7 @@ export default function Navbar() {
                                 </MenuItem>
                                 <MenuItem>
                                     {({ focus }) => (
-                                        <button className={`navbar-menu-item ${focus ? 'hover' : ''}`}> Logout </button>
+                                        <button onClick={handleLogout} className={`navbar-menu-item ${focus ? 'hover' : ''}`}> Logout </button>
                                     )}
                                 </MenuItem>
                             </MenuItems>
