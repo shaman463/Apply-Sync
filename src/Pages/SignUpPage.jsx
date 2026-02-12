@@ -3,6 +3,8 @@ import axios from 'axios';
 import { MDBContainer, MDBRow, MDBCol, MDBCard, MDBCardBody, MDBInput, MDBIcon } from 'mdb-react-ui-kit';
 import '../styles/LoginPage.css';
 import { useNavigate } from "react-router-dom";
+import { GoogleLogin } from '@react-oauth/google';
+
 
 function SignUpPage() {
     const navigate = useNavigate();
@@ -14,6 +16,49 @@ function SignUpPage() {
     });
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
+
+    const handleGoogleSuccess = async (credentialResponse) => {
+        try {
+            const credential = credentialResponse?.credential;
+            if (!credential) {
+                setMessage("Google sign-in failed. Please try again.");
+                return;
+            }
+
+            const res = await axios.post("http://localhost:5000/api/auth/google", {
+                credential
+            });
+
+            setMessage("Google login successful ✓");
+            const token = res.data.token;
+            localStorage.setItem("authToken", token);
+            localStorage.setItem("userData", JSON.stringify(res.data.user));
+
+            window.dispatchEvent(new CustomEvent('applysync-token-saved', {
+                detail: { token: token }
+            }));
+
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                chrome.runtime.sendMessage(
+                    { action: "saveToken", token: token },
+                    (response) => {
+                        if (response?.success) {
+                            console.log("Token saved to extension");
+                        }
+                    }
+                );
+            }
+
+            setTimeout(() => navigate("/dashboard"), 800);
+        } catch (err) {
+            console.error("Google sign-in error:", err);
+            setMessage(err.response?.data?.message || "Google sign-in failed. Please try again.");
+        }
+    };
+
+    const handleGoogleError = () => {
+        setMessage("Google sign-in failed. Please try again.");
+    };
 
     const handleChange = (e) => {
         setFormData({
@@ -38,24 +83,24 @@ function SignUpPage() {
             setMessage("Account created successfully ✓");
             const token = res.data.token;
             localStorage.setItem("authToken", token);
-            
+
             // Dispatch custom event for extension (more reliable than storage event)
             window.dispatchEvent(new CustomEvent('applysync-token-saved', {
-              detail: { token: token }
+                detail: { token: token }
             }));
-            
+
             // Store token in Chrome extension storage
             if (typeof chrome !== 'undefined' && chrome.runtime) {
                 chrome.runtime.sendMessage(
-                  { action: "saveToken", token: token },
-                  (response) => {
-                    if (response?.success) {
-                      console.log("Token saved to extension");
+                    { action: "saveToken", token: token },
+                    (response) => {
+                        if (response?.success) {
+                            console.log("Token saved to extension");
+                        }
                     }
-                  }
                 );
             }
-            
+
             // Redirect to dashboard after successful signup
             setTimeout(() => {
                 navigate('/dashboard');
@@ -93,7 +138,7 @@ function SignUpPage() {
                     <MDBCard className='bg-glass'>
                         <MDBCardBody className='login-card-body'>
                             <h3 className='login-card-title'>Sign Up</h3>
-                            
+
                             {message && (
                                 <div className={`alert ${message.includes('failed') || message.includes('❌') ? 'alert-error' : 'alert-success'}`}>
                                     {message}
@@ -103,11 +148,11 @@ function SignUpPage() {
                             <form onSubmit={handleSignUp}>
                                 <MDBRow className='form-name-row'>
                                     <MDBCol className='form-name-col'>
-                                        <MDBInput 
-                                            wrapperClass='mb-4' 
-                                            id='firstName' 
+                                        <MDBInput
+                                            wrapperClass='mb-4'
+                                            id='firstName'
                                             name='firstName'
-                                            type='text' 
+                                            type='text'
                                             placeholder='First Name'
                                             value={formData.firstName}
                                             onChange={handleChange}
@@ -115,9 +160,9 @@ function SignUpPage() {
                                         />
                                     </MDBCol>
                                     <MDBCol className='form-name-col'>
-                                        <MDBInput 
-                                            wrapperClass='mb-4' 
-                                            placeholder='Last Name' 
+                                        <MDBInput
+                                            wrapperClass='mb-4'
+                                            placeholder='Last Name'
                                             id='lastName'
                                             name='lastName'
                                             type='text'
@@ -128,9 +173,9 @@ function SignUpPage() {
                                     </MDBCol>
                                 </MDBRow>
 
-                                <MDBInput 
-                                    wrapperClass='mb-4' 
-                                    placeholder='Email address' 
+                                <MDBInput
+                                    wrapperClass='mb-4'
+                                    placeholder='Email address'
                                     id='email'
                                     name='email'
                                     type='email'
@@ -138,10 +183,10 @@ function SignUpPage() {
                                     onChange={handleChange}
                                     required
                                 />
-                                
-                                <MDBInput 
-                                    wrapperClass='mb-4' 
-                                    placeholder='Password' 
+
+                                <MDBInput
+                                    wrapperClass='mb-4'
+                                    placeholder='Password'
                                     id='password'
                                     name='password'
                                     type='password'
@@ -150,34 +195,22 @@ function SignUpPage() {
                                     required
                                 />
 
-                                <button 
+                                <button
                                     type='submit'
                                     disabled={loading}
                                     className='login-btn'
                                 >
                                     {loading ? 'Creating Account...' : 'SIGN UP'}
                                 </button>
+                                <div className="social-login-section">
+                                    <p>or sign up with:</p>
+                                    <GoogleLogin
+                                        onSuccess={handleGoogleSuccess}
+                                        onError={handleGoogleError}
+                                        useOneTap={false}
+                                    />
+                                </div>
                             </form>
-
-                            <div className="social-login-section">
-                                <p>or sign up with:</p>
-
-                                <button className='social-btn facebook'>
-                                    <MDBIcon fab icon='facebook-f' />
-                                </button>
-
-                                <button className='social-btn google'>
-                                    <MDBIcon fab icon='google' />
-                                </button>
-
-                                <button className='social-btn twitter'>
-                                    <MDBIcon fab icon='twitter' />
-                                </button>
-
-                                <button className='social-btn github'>
-                                    <MDBIcon fab icon='github' />
-                                </button>
-                            </div>
                         </MDBCardBody>
                     </MDBCard>
                 </MDBCol>
