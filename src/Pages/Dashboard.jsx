@@ -5,15 +5,21 @@ import "../styles/Dashboard.css";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  // It controls which tab is visible i.e., overview, applications, interviews
   const [activeTab, setActiveTab] = useState("overview");
+  // stores job applications that are fetched from the backend
   const [applications, setApplications] = useState([]);
+  // Control Ui when fetching jobs
   const [isLoadingApps, setIsLoadingApps] = useState(false);
   const [appsError, setAppsError] = useState("");
 
+  // This runs once the component is loaded
   useEffect(() => {
     const fetchJobs = async () => {
-      const token = localStorage.getItem("authToken");
 
+      // token checking is being done here 
+      const token = localStorage.getItem("authToken");
+      // and if not
       if (!token) {
         setAppsError("Please log in to view applications.");
         return;
@@ -21,18 +27,20 @@ const Dashboard = () => {
 
       setIsLoadingApps(true);
       setAppsError("");
-
+      // It fetched the jobs from the backend 
+      // it sends to jwt token the backend verifies the user  and return the jobs
       try {
         const res = await axios.get("http://localhost:5000/api/jobs", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-
+        // Saves the data
         setApplications(res.data?.jobs || []);
       } 
       catch (error) {
         console.error("Error fetching jobs:", error);
+        // if any error occur god forbid
         setAppsError("Unable to load applications. Please try again.");
       }
        finally {
@@ -69,12 +77,17 @@ const Dashboard = () => {
     },
   ];
 
+
+  // As the name suggests this is used to handle logout
+
   const handleLogout = () => {
+    // remove the jwt token and navigate you to the landing page
     localStorage.removeItem("authToken");
     localStorage.removeItem("userData");
     navigate("/");
   };
 
+  // assigns colors based on job status
   const getStatusColor = (status) => {
     const normalized = (status || "").toLowerCase();
 
@@ -108,6 +121,7 @@ const Dashboard = () => {
       .join(" ");
   };
 
+  // Date formatting
   const formatDate = (value) => {
     if (!value) return "—";
 
@@ -123,7 +137,7 @@ const Dashboard = () => {
     if (!url) return;
     window.open(url, "_blank", "noopener,noreferrer");
   };
-
+ // this is our begining of our ui of dashboard
   return (
     <div className="dashboard">
       {/* Header */}
