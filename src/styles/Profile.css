@@ -246,7 +246,7 @@
 
 .btn-secondary {
   padding: 12px 24px;
-  background: #f0f0f0;
+  background: #f1a3fa91;
   color: #333;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
@@ -258,7 +258,7 @@
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #e0e0e0;
+  background: #610884;
   border-color: #999;
 }
 

@@ -195,7 +195,12 @@ const Dashboard = () => {
             >
               ⚙️ Profile
             </button>
-            <button className="nav-link">📄 Resume</button>
+            <button
+              className="nav-link"
+              onClick={() => navigate("/resume")}
+            >
+              📄 Resume
+            </button>
           </div>
         </nav>
 

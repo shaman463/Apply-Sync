@@ -1,0 +1,137 @@
+.resume-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 20px;
+  background: radial-gradient(circle at top, #f7f1ff 0%, #f2f6ff 40%, #ffffff 100%);
+  font-family: "Manrope", "Segoe UI", sans-serif;
+}
+
+.resume-card {
+  width: min(720px, 100%);
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 36px;
+  box-shadow: 0 20px 60px rgba(17, 24, 39, 0.12);
+}
+
+.resume-title {
+  font-size: 30px;
+  margin: 0 0 8px;
+  color: #111827;
+}
+
+.resume-subtitle {
+  margin: 0 0 24px;
+  color: #4b5563;
+}
+
+.resume-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.resume-input {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border: 1px dashed #cbd5f5;
+  border-radius: 16px;
+  background: #f8f9ff;
+}
+
+.resume-input-label {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.resume-input input[type="file"] {
+  font-size: 14px;
+}
+
+.resume-file {
+  margin: 0;
+  font-size: 14px;
+  color: #374151;
+}
+
+.resume-warning {
+  margin: 0;
+  color: #b45309;
+  font-size: 14px;
+}
+
+.resume-success {
+  margin: 0;
+  color: #15803d;
+  font-size: 14px;
+}
+
+.resume-preview {
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  height: 480px;
+  overflow: hidden;
+}
+
+.resume-preview-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.resume-preview-info {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: #4b5563;
+  text-align: center;
+  padding: 24px;
+}
+
+.resume-preview-info p {
+  margin: 0;
+}
+
+.resume-preview-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.resume-preview-actions a {
+  text-decoration: none;
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.resume-submit {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-size: 15px;
+  font-weight: 600;
+  background: linear-gradient(120deg, #2563eb, #7c3aed);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.resume-submit:hover {
+  filter: brightness(1.05);
+}
+
+@media (max-width: 600px) {
+  .resume-card {
+    padding: 28px 22px;
+  }
+
+  .resume-title {
+    font-size: 24px;
+  }
+}

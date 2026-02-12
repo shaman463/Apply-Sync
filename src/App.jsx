@@ -7,6 +7,7 @@ import LandingPage from './Pages/LandingPage';
 import ProtectedRoutes from './Services/ProtectedRoutes';
 import Dashboard from './Pages/Dashboard';
 import Profile from './Pages/Profile';
+import Resume from './Pages/Resume';
 
 function App() {
   const [count, setCount] = useState(0);
@@ -24,6 +25,8 @@ function App() {
         <Route path="/dashboard" element={<ProtectedRoutes> <Dashboard /> </ProtectedRoutes>}
         />
         <Route path="/profile" element={<ProtectedRoutes> <Profile /> </ProtectedRoutes>}
+        />
+        <Route path="/resume" element={<ProtectedRoutes> <Resume /> </ProtectedRoutes>}
         />
       </Routes>
     </Router>
