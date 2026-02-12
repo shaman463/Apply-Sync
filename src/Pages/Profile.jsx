@@ -99,8 +99,7 @@ const Profile = () => {
           {/* Profile Header with Avatar */}
           <div className="profile-header-card">
             <div className="profile-avatar">
-              {userData.FirstName?.charAt(0).toUpperCase() ||
-                "U"}
+              {userData.FirstName?.charAt(0).toUpperCase() || "U"}
             </div>
             <div className="profile-info-header">
               <h2>
@@ -112,7 +111,11 @@ const Profile = () => {
 
           {/* Message Alert */}
           {message && (
-            <div className={`alert ${message.includes("successfully") ? "alert-success" : "alert-error"}`}>
+            <div
+              className={`alert ${
+                message.includes("successfully") ? "alert-success" : "alert-error"
+              }`}
+            >
               {message}
             </div>
           )}
@@ -208,13 +211,13 @@ const Profile = () => {
             <h3>Security & Settings</h3>
             <div className="settings-group">
               <button className="settings-btn">
-                ğŸ” Change Password
+                í´ Change Password
               </button>
               <button className="settings-btn">
-                ğŸ”” Notification Preferences
+                í´” Notification Preferences
               </button>
               <button className="settings-btn danger">
-                ğŸ—‘ï¸ Delete Account
+                í·‘ï¸ Delete Account
               </button>
             </div>
           </div>
