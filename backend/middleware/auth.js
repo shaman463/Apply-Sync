@@ -12,7 +12,12 @@ export const verifyToken = async (req, res, next) => {
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.userId = decoded.id;
+        const user = await prisma.user.findUnique({ where: { id: decoded.id } });
+        if (!user) {
+            return res.status(401).json({ message: "User not found. Please log in again." });
+        }
+
+        req.userId = user.id;
         next();
     }
     catch (error) {

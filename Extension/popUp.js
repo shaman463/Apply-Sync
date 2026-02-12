@@ -124,6 +124,13 @@ document.getElementById("saveJob").addEventListener("click", () => {
                 // we are herr converting response to .text() to avoid JSON errors
                 // basically we are here handling the backend errors
                  else {
+                  if (apiResponse.status === 401) {
+                    chrome.runtime.sendMessage({ action: "logout" });
+                    statusDiv.textContent = "Session expired in extension. Open ApplySync and log in again.";
+                    statusDiv.style.color = "red";
+                    saveBtn.disabled = false;
+                    return;
+                  }
                   try {
                     const error = JSON.parse(responseText);
                     statusDiv.textContent = "Failed: " + (error.message || "Unknown error");
