@@ -153,8 +153,23 @@ function SignUpPage() {
                                             id='firstName'
                                             name='firstName'
                                             type='text'
-                                            placeholder='Name'
+                                            placeholder='First Name'
                                             value={formData.firstName}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </MDBCol>
+                                </MDBRow>
+
+                                <MDBRow className='form-name-row'>
+                                    <MDBCol className='form-name-col'>
+                                        <MDBInput
+                                            wrapperClass='mb-4'
+                                            id='lastName'
+                                            name='lastName'
+                                            type='text'
+                                            placeholder='Last Name'
+                                            value={formData.lastName}
                                             onChange={handleChange}
                                             required
                                         />
