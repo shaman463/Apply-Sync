@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../styles/Dashboard.css";
-import Navbar from "../components/Navbar";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -126,7 +125,6 @@ const Dashboard = () => {
   
     
     <div className="dashboard">
-       <Navbar/>
       {/* Main Content */}
       <div className={`dashboard-container ${showProfilePanel ? "show-profile" : ""}`}>
         {/* Sidebar Navigation */}
