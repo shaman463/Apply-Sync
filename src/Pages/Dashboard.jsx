@@ -61,25 +61,6 @@ const Dashboard = () => {
     { label: "Pending", value: 13, icon: "⏳", color: "#ffa400" },
   ];
 
-  const upcomingInterviews = [
-    {
-      id: 1,
-      company: "Google",
-      position: "Frontend Developer",
-      date: "2026-02-01",
-      time: "10:00 AM",
-      type: "Technical"
-    },
-    {
-      id: 2,
-      company: "Microsoft",
-      position: "Full Stack Engineer",
-      date: "2026-02-03",
-      time: "2:30 PM",
-      type: "HR"
-    },
-  ];
-
 
   // As the name suggests this is used to handle logout
 
@@ -170,15 +151,6 @@ const Dashboard = () => {
             >
               📝 Applications
             </button>
-            <button 
-              className={`nav-link ${activeTab === "interviews" && !showProfilePanel ? "active" : ""}`}
-              onClick={() => {
-                setActiveTab("interviews");
-                setShowProfilePanel(false);
-              }}
-            >
-              🎤 Interviews
-            </button>
           </div>
 
           <div className="nav-section">
@@ -258,31 +230,6 @@ const Dashboard = () => {
                       >
                         View
                       </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {activeTab === "interviews" && (
-            <section className="dashboard-card">
-              <h2>Interview Schedule</h2>
-              <div className="interviews-detailed">
-                {upcomingInterviews.map((interview) => (
-                  <div key={interview.id} className="interview-detail-card">
-                    <div className="interview-header">
-                      <h3>{interview.company}</h3>
-                      <span className="interview-type-badge">{interview.type}</span>
-                    </div>
-                    <p className="interview-position">{interview.position}</p>
-                    <div className="interview-meta">
-                      <span>📅 {interview.date}</span>
-                      <span>⏰ {interview.time}</span>
-                    </div>
-                    <div className="interview-actions">
-                      <button className="btn-primary">Join Interview</button>
-                      <button className="btn-secondary">Reschedule</button>
                     </div>
                   </div>
                 ))}

@@ -11,7 +11,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(120deg, #0ea5a4 0%, #f97316 100%);
   color: white;
   padding: 60px 20px;
   position: relative;
@@ -93,7 +93,7 @@
 
 .btn-primary {
   background: white;
-  color: #667eea;
+  color: var(--primary-dark);
 }
 
 .btn-primary:hover {
@@ -109,7 +109,7 @@
 
 .btn-secondary:hover {
   background: white;
-  color: #667eea;
+  color: var(--primary-dark);
 }
 
 .btn-outline {
@@ -197,7 +197,7 @@
 .card-value {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-dark);
 }
 
 /* Features Section */
