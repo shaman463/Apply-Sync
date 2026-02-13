@@ -2,7 +2,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 import '../styles/Navbar.css';
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 export default function Navbar() {
@@ -28,12 +28,12 @@ export default function Navbar() {
                 <div className="navbar-inner">
                     {/* Logo */}
                     <div>
-                        <span className="navbar-logo">ApplySync</span>
+                        <Link to="/" className="navbar-logo">ApplySync</Link>
                     </div>
 
                     {/* Desktop Navigation */}
                     <div className="navbar-nav">{navigation.map((item) => (
-                            <a key={item.name} href={item.href} className="navbar-link">{item.name}</a>
+                            <Link key={item.name} to={item.href} className="navbar-link">{item.name}</Link>
                         ))}
                     </div>
 
@@ -52,12 +52,12 @@ export default function Navbar() {
                             <MenuItems className="navbar-menu-items">
                                 <MenuItem>
                                     {({ focus }) => (
-                                        <a href="/profile" className={`navbar-menu-item ${focus ? 'hover' : ''}`}> Profile </a>
+                                        <Link to="/profile" className={`navbar-menu-item ${focus ? 'hover' : ''}`}> Profile </Link>
                                     )}
                                 </MenuItem>
                                 <MenuItem>
                                     {({ focus }) => (
-                                        <a href="/settings" className={`navbar-menu-item ${focus ? 'hover' : ''}`}> Settings </a>
+                                        <Link to="/settings" className={`navbar-menu-item ${focus ? 'hover' : ''}`}> Settings </Link>
                                     )}
                                 </MenuItem>
                                 <MenuItem>
@@ -87,7 +87,7 @@ export default function Navbar() {
             {mobileMenuOpen && (
                 <div className="navbar-mobile-menu">
                     {navigation.map((item) => (
-                        <a key={item.name} href={item.href} className="navbar-mobile-link">{item.name}</a>
+                        <Link key={item.name} to={item.href} className="navbar-mobile-link">{item.name}</Link>
                     ))}
                 </div>
             )}
