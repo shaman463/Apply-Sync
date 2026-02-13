@@ -819,43 +819,157 @@
   transition: width 0.3s ease;
 }
 
-/* Applications Table */
-.applications-table {
-  border: 1px solid var(--gray-200);
-  border-radius: 8px;
+/* Applications Board */
+.applications-board {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.applications-state {
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px dashed var(--gray-300);
+  background: linear-gradient(135deg, rgba(14, 165, 164, 0.08), rgba(249, 115, 22, 0.06));
+  color: var(--gray-700);
+  font-weight: 600;
+}
+
+.app-card {
+  border-radius: 16px;
+  padding: 20px 22px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: linear-gradient(135deg, rgba(14, 165, 164, 0.06), rgba(249, 115, 22, 0.05));
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.app-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.12);
+}
+
+.app-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.company-block {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.company-logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--primary-dark);
+  border: 1px solid rgba(148, 163, 184, 0.3);
   overflow: hidden;
 }
 
-.table-header {
-  display: grid;
-  grid-template-columns: 1.5fr 1.5fr 1fr 1fr 0.8fr;
-  background: var(--gray-100);
-  padding: 15px;
+.company-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.company-name {
+  margin: 0;
+  color: var(--gray-600);
+  font-size: 0.9rem;
   font-weight: 600;
-  color: var(--gray-700);
-  border-bottom: 2px solid var(--gray-200);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.table-row {
+.role-title {
+  margin: 6px 0 4px;
+  font-size: 1.25rem;
+  color: var(--gray-900);
+}
+
+.role-subtitle {
+  margin: 0;
+  color: var(--gray-500);
+  font-size: 0.9rem;
+}
+
+.status-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.source-pill {
+  background: rgba(14, 165, 164, 0.15);
+  color: var(--primary-dark);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.app-meta {
   display: grid;
-  grid-template-columns: 1.5fr 1.5fr 1fr 1fr 0.8fr;
-  padding: 15px;
-  border-bottom: 1px solid var(--gray-200);
-  align-items: center;
-  transition: all 0.3s ease;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
 }
 
-.table-row:last-child {
-  border-bottom: none;
+.meta-item {
+  background: white;
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.table-row:hover {
-  background: var(--gray-50);
+.meta-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--gray-500);
+  font-weight: 700;
+  letter-spacing: 0.6px;
 }
 
-.col {
+.meta-value {
+  font-size: 0.95rem;
+  color: var(--gray-800);
+  font-weight: 600;
+}
+
+.app-notes {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.app-notes p {
+  margin: 8px 0 0;
   color: var(--gray-700);
   font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.app-actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .action-btn {
@@ -1016,27 +1130,21 @@
     padding: 20px;
   }
 
-  .table-header,
-  .table-row {
+  .app-card {
+    padding: 18px;
+  }
+
+  .app-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .status-stack {
+    align-items: flex-start;
+  }
+
+  .app-meta {
     grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  .table-header {
-    display: none;
-  }
-
-  .table-row {
-    border: 1px solid var(--gray-200);
-    padding: 15px;
-    margin-bottom: 10px;
-  }
-
-  .col::before {
-    content: attr(data-label);
-    font-weight: 600;
-    color: var(--gray-700);
-    margin-right: 10px;
   }
 }
 
@@ -1070,6 +1178,19 @@
 
   .btn-primary,
   .btn-secondary {
+    width: 100%;
+  }
+
+  .company-block {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .app-actions {
+    justify-content: stretch;
+  }
+
+  .app-actions .action-btn {
     width: 100%;
   }
 }

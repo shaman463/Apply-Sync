@@ -116,6 +116,13 @@ const Dashboard = () => {
     return parsed.toISOString().slice(0, 10);
   };
 
+  const getCompanyInitials = (name) => {
+    if (!name) return "NA";
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  };
+
   const handleViewJob = (url) => {
     if (!url) return;
     window.open(url, "_blank", "noopener,noreferrer");
@@ -152,7 +159,7 @@ const Dashboard = () => {
           </div>
 
           <div className="nav-section">
-            <h3>Settings</h3>
+            <h3>Additoinal</h3>
             <button className="nav-link" onClick={() => navigate("/resume")}>
               📄 Resume
             </button>
@@ -184,53 +191,82 @@ const Dashboard = () => {
           {activeTab === "applications" && (
             <section className="dashboard-card">
               <h2>All Applications</h2>
-              <div className="applications-table">
-                <div className="table-header">
-                  <div className="col">Company</div>
-                  <div className="col">Position</div>
-                  <div className="col">Status</div>
-                  <div className="col">Date Applied</div>
-                  <div className="col">Action</div>
-                </div>
+              <div className="applications-board">
                 {isLoadingApps && (
-                  <div className="table-row">
-                    <div className="col">Loading applications...</div>
-                  </div>
+                  <div className="applications-state">Loading applications...</div>
                 )}
                 {!isLoadingApps && appsError && (
-                  <div className="table-row">
-                    <div className="col">{appsError}</div>
-                  </div>
+                  <div className="applications-state">{appsError}</div>
                 )}
                 {!isLoadingApps && !appsError && applications.length === 0 && (
-                  <div className="table-row">
-                    <div className="col">No applications saved yet.</div>
-                  </div>
+                  <div className="applications-state">No applications saved yet.</div>
                 )}
-                {!isLoadingApps && !appsError && applications.map((app) => (
-                  <div key={app._id || app.id} className="table-row">
-                    <div className="col">💼 {app.company || "—"}</div>
-                    <div className="col">{app.title || "—"}</div>
-                    <div className="col">
-                      <span 
-                        className="status-badge"
-                        style={{ backgroundColor: getStatusColor(app.status) }}
-                      >
-                        {formatStatusLabel(app.status)}
-                      </span>
-                    </div>
-                    <div className="col">{formatDate(app.appliedDate || app.savedAt)}</div>
-                    <div className="col">
-                      <button
-                        className="action-btn"
-                        onClick={() => handleViewJob(app.url)}
-                        disabled={!app.url}
-                      >
-                        View
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                {!isLoadingApps && !appsError && applications.map((app) => {
+                  const companyName = app.company || "—";
+                  const roleTitle = app.title || "—";
+                  const location = app.location || "Remote";
+                  const salary = app.salaryRange || "Not disclosed";
+                  const employmentType = app.employmentType || "Full-time";
+                  const source = app.source || "Direct";
+                  const notes = app.notes || "Add a short note to remember why this role stands out.";
+
+                  return (
+                    <article key={app._id || app.id} className="app-card">
+                      <div className="app-card-header">
+                        <div className="company-block">
+                          <div className="company-logo">
+                            {app.companyLogo ? (
+                              <img src={app.companyLogo} alt={companyName} />
+                            ) : (
+                              <span>{getCompanyInitials(companyName)}</span>
+                            )}
+                          </div>
+                          <div>
+                            <p className="company-name">{companyName}</p>
+                            <h3 className="role-title">{roleTitle}</h3>
+                            <p className="role-subtitle">Applied {formatDate(app.appliedDate || app.savedAt)}</p>
+                          </div>
+                        </div>
+                        <div className="status-stack">
+                          <span
+                            className="status-badge"
+                            style={{ backgroundColor: getStatusColor(app.status) }}
+                          >
+                            {formatStatusLabel(app.status)}
+                          </span>
+                          <span className="source-pill">Via {source}</span>
+                        </div>
+                      </div>
+                      <div className="app-meta">
+                        <div className="meta-item">
+                          <span className="meta-label">Location</span>
+                          <span className="meta-value">{location}</span>
+                        </div>
+                        <div className="meta-item">
+                          <span className="meta-label">Comp</span>
+                          <span className="meta-value">{salary}</span>
+                        </div>
+                        <div className="meta-item">
+                          <span className="meta-label">Type</span>
+                          <span className="meta-value">{employmentType}</span>
+                        </div>
+                      </div>
+                      <div className="app-notes">
+                        <span className="meta-label">Notes</span>
+                        <p>{notes}</p>
+                      </div>
+                      <div className="app-actions">
+                        <button
+                          className="action-btn"
+                          onClick={() => handleViewJob(app.url)}
+                          disabled={!app.url}
+                        >
+                          View job
+                        </button>
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
             </section>
           )}
