@@ -111,10 +111,8 @@ const Profile = () => {
 
           {/* Message Alert */}
           {message && (
-            <div
-              className={`alert ${
-                message.includes("successfully") ? "alert-success" : "alert-error"
-              }`}
+            <div className={`alert ${message.includes("successfully") ? "alert-success" : "alert-error"
+                }`}
             >
               {message}
             </div>
@@ -136,10 +134,7 @@ const Profile = () => {
                 <p>{userData.email || "‚Äî"}</p>
               </div>
 
-              <button
-                className="btn-primary"
-                onClick={() => setIsEditing(true)}
-              >
+              <button className="btn-primary" onClick={() => setIsEditing(true)}>
                 Edit Profile
               </button>
             </div>
@@ -173,54 +168,22 @@ const Profile = () => {
 
               <div className="form-group">
                 <label htmlFor="email">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
+                <input type="email" id="email" name="email"
                   value={formData.email}
-                  onChange={handleInputChange}
-                  placeholder="Enter email"
-                  required
-                  disabled
-                />
+                  onChange={handleInputChange} placeholder="Enter email" required disabled />
                 <small>Email cannot be changed</small>
               </div>
 
               <div className="form-actions">
-                <button
-                  type="submit"
-                  className="btn-primary"
-                  disabled={isLoading}
-                >
+                <button type="submit" className="btn-primary" disabled={isLoading}>
                   {isLoading ? "Saving..." : "Save Changes"}
                 </button>
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  onClick={handleCancel}
-                  disabled={isLoading}
-                >
+                <button type="button" className="btn-secondary" onClick={handleCancel} disabled={isLoading}>
                   Cancel
                 </button>
               </div>
             </form>
           )}
-
-          {/* Additional Settings */}
-          <div className="profile-settings">
-            <h3>Security & Settings</h3>
-            <div className="settings-group">
-              <button className="settings-btn">
-                Ì¥ê Change Password
-              </button>
-              <button className="settings-btn">
-                Ì¥î Notification Preferences
-              </button>
-              <button className="settings-btn danger">
-                Ì∑ëÔ∏è Delete Account
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>
