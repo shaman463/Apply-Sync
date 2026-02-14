@@ -1,126 +1,65 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap");
-
-.settings-page {
-  min-height: 100vh;
-  padding: 72px 20px 80px;
-  background:
-    radial-gradient(circle at 18% 8%, rgba(20, 184, 166, 0.2), transparent 40%),
-    radial-gradient(circle at 80% 0%, rgba(249, 115, 22, 0.18), transparent 45%),
-    linear-gradient(180deg, #f7f9ff 0%, #eef3ff 55%, #ffffff 100%);
-  color: #0f172a;
-  font-family: "Inter", "Segoe UI", sans-serif;
+.settings-header {
+  align-items: center;
 }
 
-.settings-hero {
-  max-width: 1120px;
-  margin: 0 auto 32px;
-  display: flex;
-  justify-content: space-between;
-  gap: 28px;
-  align-items: flex-start;
-}
-
-.settings-hero h1 {
-  font-family: "Space Grotesk", "Inter", sans-serif;
-  font-size: clamp(32px, 4vw, 44px);
-  margin: 12px 0 12px;
-  letter-spacing: -0.02em;
-}
-
-.settings-hero p {
-  margin: 0;
-  max-width: 560px;
-  color: #475569;
-  line-height: 1.6;
-}
-
-.settings-back {
-  border: none;
-  background: rgba(15, 118, 110, 0.12);
-  color: #0f766e;
-  padding: 8px 16px;
-  border-radius: 999px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.settings-back:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgba(15, 118, 110, 0.2);
-}
-
-.settings-hero-card {
-  min-width: 220px;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 18px;
-  padding: 20px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
-}
-
-.settings-hero-card h3 {
-  margin: 0 0 12px;
-  font-size: 16px;
-  font-family: "Space Grotesk", "Inter", sans-serif;
-}
-
-.settings-hero-card ul {
-  margin: 0;
-  padding-left: 18px;
-  color: #475569;
-  display: grid;
-  gap: 6px;
+.settings-header-btn {
+  white-space: nowrap;
 }
 
 .settings-banner {
-  max-width: 1120px;
-  margin: 0 auto 24px;
-  padding: 12px 16px;
-  border-radius: 14px;
+  max-width: 1400px;
+  margin: 1.5rem auto -0.5rem;
+  padding: 0.9rem 1.25rem;
+  border-radius: 0.85rem;
   background: rgba(14, 165, 164, 0.12);
   color: #0f766e;
   font-weight: 600;
+  border: 1px solid rgba(14, 165, 164, 0.2);
 }
 
-.settings-grid {
-  max-width: 1120px;
-  margin: 0 auto;
+.settings-container {
+  align-items: start;
+}
+
+.settings-nav .nav-link {
+  text-decoration: none;
+}
+
+.settings-content {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
+  gap: 2rem;
 }
 
-.settings-card {
-  background: rgba(255, 255, 255, 0.96);
-  border-radius: 20px;
-  padding: 24px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.settings-section {
+  display: grid;
+  gap: 1.25rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
 }
 
-.settings-card-header {
+.settings-section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.settings-section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
 }
 
-.settings-card-header h2 {
+.settings-section-header h2 {
   margin: 0;
-  font-size: 20px;
-  font-family: "Space Grotesk", "Inter", sans-serif;
+  font-size: 1.5rem;
 }
 
-.settings-card-header span {
-  font-size: 12px;
+.settings-section-header span {
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-weight: 700;
-  color: #0f766e;
+  color: var(--primary-dark);
   background: rgba(20, 184, 166, 0.15);
   padding: 6px 10px;
   border-radius: 999px;
@@ -128,15 +67,15 @@
 
 .settings-form {
   display: grid;
-  gap: 12px;
+  gap: 0.85rem;
 }
 
 .settings-form label {
   display: grid;
-  gap: 8px;
+  gap: 0.5rem;
   font-weight: 600;
-  color: #334155;
-  font-size: 14px;
+  color: var(--gray-700);
+  font-size: 0.85rem;
 }
 
 .settings-actions {
@@ -147,62 +86,50 @@
 
 .settings-list {
   display: grid;
-  gap: 14px;
+  gap: 1rem;
 }
 
-.settings-toggle {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: center;
-  background: rgba(248, 250, 252, 0.7);
-  border-radius: 14px;
-  padding: 14px 16px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-}
-
-.settings-toggle strong {
-  display: block;
-  color: #0f172a;
-  margin-bottom: 4px;
-}
-
-.settings-toggle span {
-  color: #64748b;
-  font-size: 14px;
-}
-
-.settings-toggle input {
-  width: 44px;
-  height: 24px;
-  accent-color: #0ea5a4;
-}
-
+.settings-toggle,
 .settings-support {
   display: flex;
   justify-content: space-between;
   gap: 16px;
   align-items: center;
-  background: rgba(248, 250, 252, 0.7);
-  border-radius: 14px;
-  padding: 14px 16px;
+  background: var(--gray-50);
+  border-radius: 0.85rem;
+  padding: 0.9rem 1rem;
   border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
+.settings-toggle strong,
 .settings-support strong {
   display: block;
-  color: #0f172a;
+  color: var(--gray-900);
   margin-bottom: 4px;
 }
 
+.settings-toggle span,
 .settings-support span {
-  color: #64748b;
-  font-size: 14px;
+  color: var(--gray-500);
+  font-size: 0.9rem;
+}
+
+.settings-toggle input {
+  width: 44px;
+  height: 24px;
+  accent-color: var(--primary);
 }
 
 .settings-danger {
+  background: rgba(254, 226, 226, 0.5);
+  border-radius: 0.85rem;
+  padding: 1.5rem;
   border: 1px solid rgba(239, 68, 68, 0.3);
-  background: rgba(255, 240, 240, 0.7);
+}
+
+.settings-danger .settings-section-header span {
+  color: #b91c1c;
+  background: rgba(239, 68, 68, 0.12);
 }
 
 .settings-danger-text {
@@ -211,12 +138,10 @@
   margin: 0;
 }
 
-@media (max-width: 860px) {
-  .settings-hero {
+@media (max-width: 900px) {
+  .settings-header {
     flex-direction: column;
-  }
-
-  .settings-hero-card {
-    width: 100%;
+    align-items: flex-start;
+    gap: 1rem;
   }
 }

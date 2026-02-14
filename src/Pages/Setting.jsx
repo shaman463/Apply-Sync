@@ -33,220 +33,217 @@ const Setting = () => {
 	};
 
 	return (
-		<div className="settings-page">
-			<header className="settings-hero">
-				<div>
-					<button className="settings-back" onClick={() => navigate("/dashboard")}>
-						Back to dashboard
-					</button>
+		<div className="dashboard settings-page">
+			<header className="dashboard-header settings-header">
+				<div className="header-left">
 					<h1>Settings</h1>
-					<p>
-						Manage security, privacy, notifications, and support preferences for your ApplySync account.
+					<p className="welcome-text">
+						Manage security, privacy, notifications, and support preferences.
 					</p>
 				</div>
-				<div className="settings-hero-card">
-					<h3>Account status</h3>
-					<ul>
-						<li>Plan: Pro Trial</li>
-						<li>2FA: {preferences.twoFactor ? "Enabled" : "Off"}</li>
-						<li>Region: United States</li>
-					</ul>
-				</div>
+				<button className="logout-btn settings-header-btn" onClick={() => navigate("/dashboard")}>
+					Back to dashboard
+				</button>
 			</header>
 
 			{feedback && <div className="settings-banner">{feedback}</div>}
 
-			<div className="settings-grid">
-				<section className="settings-card">
-					<div className="settings-card-header">
-						<h2>Change password</h2>
-						<span>Security</span>
+			<div className="dashboard-container settings-container">
+				<nav className="dashboard-nav settings-nav">
+					<div className="nav-section">
+						<h3>Account</h3>
+						<a className="nav-link" href="#security">Security</a>
+						<a className="nav-link" href="#notifications">Notifications</a>
 					</div>
-					<form className="settings-form" onSubmit={handleChangePassword}>
-						<label>
-							Current password
-							<input type="password" placeholder="Enter current password" required />
-						</label>
-						<label>
-							New password
-							<input type="password" placeholder="Use a strong password" required />
-						</label>
-						<label>
-							Confirm new password
-							<input type="password" placeholder="Re-enter new password" required />
-						</label>
-						<div className="settings-actions">
-							<button type="submit" className="btn btn-primary">Update password</button>
-							<button type="button" className="btn btn-secondary">Send reset link</button>
+					<div className="nav-section">
+						<h3>Controls</h3>
+						<a className="nav-link" href="#privacy">Privacy &amp; Support</a>
+						<a className="nav-link" href="#data">Data Controls</a>
+					</div>
+					<div className="nav-section">
+						<h3>Danger</h3>
+						<a className="nav-link" href="#delete">Delete Account</a>
+					</div>
+				</nav>
+
+				<div className="dashboard-content settings-content">
+					<section id="security" className="settings-section">
+						<div className="settings-section-header">
+							<h2>Change password</h2>
 						</div>
-					</form>
-				</section>
+						<form className="settings-form" onSubmit={handleChangePassword}>
+							<label>
+								Current password
+								<input type="password" placeholder="Enter current password" required />
+							</label>
+							<label>
+								New password
+								<input type="password" placeholder="Use a strong password" required />
+							</label>
+							<label>
+								Confirm new password
+								<input type="password" placeholder="Re-enter new password" required />
+							</label>
+							<div className="settings-actions">
+								<button type="submit" className="btn btn-primary">Update password</button>
+							</div>
+						</form>
+						<div className="settings-list">
+							<label className="settings-toggle">
+								<div>
+									<strong>Two-factor authentication</strong>
+									<span>Add an extra layer of security to your account.</span>
+								</div>
+								<input
+									type="checkbox"
+									checked={preferences.twoFactor}
+									onChange={() => handleToggle("twoFactor")}
+								/>
+							</label>
+							<div className="settings-support">
+								<div>
+									<strong>Active sessions</strong>
+									<span>Signed in on 2 devices</span>
+								</div>
+								<button className="btn btn-secondary">Sign out of all</button>
+							</div>
+						</div>
+					</section>
 
-				<section className="settings-card">
-					<div className="settings-card-header">
-						<h2>Notifications</h2>
-						<span>Preferences</span>
-					</div>
-					<div className="settings-list">
-						<label className="settings-toggle">
-							<div>
-								<strong>Email alerts</strong>
-								<span>Get updates about application status changes.</span>
-							</div>
-							<input
-								type="checkbox"
-								checked={preferences.emailAlerts}
-								onChange={() => handleToggle("emailAlerts")}
-							/>
-						</label>
-						<label className="settings-toggle">
-							<div>
-								<strong>Weekly digest</strong>
-								<span>Summary of your activity and insights.</span>
-							</div>
-							<input
-								type="checkbox"
-								checked={preferences.weeklyDigest}
-								onChange={() => handleToggle("weeklyDigest")}
-							/>
-						</label>
-						<label className="settings-toggle">
-							<div>
-								<strong>Product updates</strong>
-								<span>Announcements and feature previews.</span>
-							</div>
-							<input
-								type="checkbox"
-								checked={preferences.productUpdates}
-								onChange={() => handleToggle("productUpdates")}
-							/>
-						</label>
-					</div>
-				</section>
+					<section id="notifications" className="settings-section">
+						<div className="settings-section-header">
+							<h2>Notifications</h2>
+						</div>
+						<div className="settings-list">
+							<label className="settings-toggle">
+								<div>
+									<strong>Email alerts</strong>
+									<span>Get updates about application status changes.</span>
+								</div>
+								<input
+									type="checkbox"
+									checked={preferences.emailAlerts}
+									onChange={() => handleToggle("emailAlerts")}
+								/>
+							</label>
+							<label className="settings-toggle">
+								<div>
+									<strong>Weekly digest</strong>
+									<span>Summary of your activity and insights.</span>
+								</div>
+								<input
+									type="checkbox"
+									checked={preferences.weeklyDigest}
+									onChange={() => handleToggle("weeklyDigest")}
+								/>
+							</label>
+							<label className="settings-toggle">
+								<div>
+									<strong>Product updates</strong>
+									<span>Announcements and feature previews.</span>
+								</div>
+								<input
+									type="checkbox"
+									checked={preferences.productUpdates}
+									onChange={() => handleToggle("productUpdates")}
+								/>
+							</label>
+						</div>
+					</section>
 
-				<section className="settings-card">
-					<div className="settings-card-header">
-						<h2>Privacy and support</h2>
-						<span>Controls</span>
-					</div>
-					<div className="settings-list">
-						<label className="settings-toggle">
-							<div>
-								<strong>Public profile</strong>
-								<span>Allow recruiters to view your profile.</span>
+					<section id="privacy" className="settings-section">
+						<div className="settings-section-header">
+							<h2>Privacy and support</h2>
+						</div>
+						<div className="settings-list">
+							<label className="settings-toggle">
+								<div>
+									<strong>Public profile</strong>
+									<span>Allow recruiters to view your profile.</span>
+								</div>
+								<input
+									type="checkbox"
+									checked={preferences.showProfile}
+									onChange={() => handleToggle("showProfile")}
+								/>
+							</label>
+							<label className="settings-toggle">
+								<div>
+									<strong>Share usage data</strong>
+									<span>Help us improve the product with anonymized data.</span>
+								</div>
+								<input
+									type="checkbox"
+									checked={preferences.shareUsage}
+									onChange={() => handleToggle("shareUsage")}
+								/>
+							</label>
+							<div className="settings-support">
+								<div>
+									<strong>Support center</strong>
+									<span>Get help with billing, resumes, and job tracking.</span>
+								</div>
+								<button className="btn btn-outline">Open support</button>
 							</div>
-							<input
-								type="checkbox"
-								checked={preferences.showProfile}
-								onChange={() => handleToggle("showProfile")}
-							/>
-						</label>
-						<label className="settings-toggle">
-							<div>
-								<strong>Share usage data</strong>
-								<span>Help us improve the product with anonymized data.</span>
+							<div className="settings-support">
+								<div>
+									<strong>Privacy policy</strong>
+									<span>Review how we protect your information.</span>
+								</div>
+								<button className="btn btn-outline">View policy</button>
 							</div>
-							<input
-								type="checkbox"
-								checked={preferences.shareUsage}
-								onChange={() => handleToggle("shareUsage")}
-							/>
-						</label>
+						</div>
+					</section>
+
+					<section id="data" className="settings-section">
+						<div className="settings-section-header">
+							<h2>Data controls</h2>
+						</div>
 						<div className="settings-support">
 							<div>
-								<strong>Support center</strong>
-								<span>Get help with billing, resumes, and job tracking.</span>
+								<strong>Download my data</strong>
+								<span>Export applications, resumes, and activity history.</span>
 							</div>
-							<button className="btn btn-outline">Open support</button>
+							<button className="btn btn-secondary">Request export</button>
 						</div>
 						<div className="settings-support">
 							<div>
-								<strong>Privacy policy</strong>
-								<span>Review how we protect your information.</span>
+								<strong>Clear activity history</strong>
+								<span>Remove cached search and tracking history.</span>
 							</div>
-							<button className="btn btn-outline">View policy</button>
+							<button className="btn btn-ghost">Clear history</button>
 						</div>
-					</div>
-				</section>
+					</section>
 
-				<section className="settings-card">
-					<div className="settings-card-header">
-						<h2>Security</h2>
-						<span>Protection</span>
-					</div>
-					<div className="settings-list">
-						<label className="settings-toggle">
-							<div>
-								<strong>Two-factor authentication</strong>
-								<span>Add an extra layer of security to your account.</span>
+					<section id="delete" className="settings-section settings-danger">
+						<div className="settings-section-header">
+							<h2>Delete my account</h2>
+						</div>
+						<p className="settings-danger-text">
+							This will permanently delete your account, resumes, applications, and saved data.
+						</p>
+						<form className="settings-form" onSubmit={handleDeleteAccount}>
+							<label>
+								Type DELETE to confirm
+								<input
+									type="text"
+									placeholder="DELETE"
+									value={deleteConfirm}
+									onChange={(event) => setDeleteConfirm(event.target.value)}
+								/>
+							</label>
+							<div className="settings-actions">
+								<button
+									type="submit"
+									className="btn btn-danger"
+									disabled={deleteConfirm !== "DELETE"}
+								>
+									Delete account
+								</button>
 							</div>
-							<input
-								type="checkbox"
-								checked={preferences.twoFactor}
-								onChange={() => handleToggle("twoFactor")}
-							/>
-						</label>
-						<div className="settings-support">
-							<div>
-								<strong>Active sessions</strong>
-								<span>Signed in on 2 devices</span>
-							</div>
-							<button className="btn btn-secondary">Sign out of all</button>
-						</div>
-					</div>
-				</section>
-
-				<section className="settings-card">
-					<div className="settings-card-header">
-						<h2>Data controls</h2>
-						<span>Exports</span>
-					</div>
-					<div className="settings-support">
-						<div>
-							<strong>Download my data</strong>
-							<span>Export applications, resumes, and activity history.</span>
-						</div>
-						<button className="btn btn-secondary">Request export</button>
-					</div>
-					<div className="settings-support">
-						<div>
-							<strong>Clear activity history</strong>
-							<span>Remove cached search and tracking history.</span>
-						</div>
-						<button className="btn btn-ghost">Clear history</button>
-					</div>
-				</section>
-
-				<section className="settings-card settings-danger">
-					<div className="settings-card-header">
-						<h2>Delete my account</h2>
-						<span>Danger zone</span>
-					</div>
-					<p className="settings-danger-text">
-						This will permanently delete your account, resumes, applications, and saved data.
-					</p>
-					<form className="settings-form" onSubmit={handleDeleteAccount}>
-						<label>
-							Type DELETE to confirm
-							<input
-								type="text"
-								placeholder="DELETE"
-								value={deleteConfirm}
-								onChange={(event) => setDeleteConfirm(event.target.value)}
-							/>
-						</label>
-						<div className="settings-actions">
-							<button
-								type="submit"
-								className="btn btn-danger"
-								disabled={deleteConfirm !== "DELETE"}
-							>
-								Delete account
-							</button>
-							<button type="button" className="btn btn-secondary">Contact support first</button>
-						</div>
-					</form>
-				</section>
+						</form>
+					</section>
+				</div>
 			</div>
 		</div>
 	);
