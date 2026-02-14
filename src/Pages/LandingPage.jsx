@@ -136,35 +136,6 @@ function LandingPage() {
 
       {/* Footer */}
       <footer className="footer">
-        <div className="footer-content">
-          <div className="footer-section">
-            <h4>ApplySync</h4>
-            <p>The future of recruitment starts here</p>
-          </div>
-          <div className="footer-section">
-            <h5>Product</h5>
-            <ul>
-              <li><a href="#features">Features</a></li>
-              <li><a href="#pricing">Pricing</a></li>
-              <li><a href="#security">Security</a></li>
-            </ul>
-          </div>
-          <div className="footer-section">
-            <h5>Company</h5>
-            <ul>
-              <li><Link to="/">Home</Link></li>
-              <li><a href="#contact">Contact</a></li>
-              <li><a href="#blog">Blog</a></li>
-            </ul>
-          </div>
-          <div className="footer-section">
-            <h5>Legal</h5>
-            <ul>
-              <li><a href="#privacy">Privacy</a></li>
-              <li><a href="#terms">Terms</a></li>
-            </ul>
-          </div>
-        </div>
         <div className="footer-bottom">
           <p>&copy; 2026 ApplySync. All rights reserved.</p>
         </div>

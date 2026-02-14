@@ -15,7 +15,7 @@ import './App.css';
 
 function AppContent() {
   const location = useLocation();
-  const authPages = ['/login', '/signup', '/settings'];
+  const authPages = ['/', '/login', '/signup', '/settings'];
   const showNavbar = !authPages.includes(location.pathname);
 
   return (
