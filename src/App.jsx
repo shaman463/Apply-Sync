@@ -10,6 +10,7 @@ import Resume from './Pages/Resume';
 import About from './Pages/About';
 import Services from './Pages/Services';
 import Contact from './Pages/Contact';
+import Setting from './Pages/Setting';
 import './App.css';
 
 function AppContent() {
@@ -34,6 +35,7 @@ function AppContent() {
           <Route path="/dashboard" element={<ProtectedRoutes><Dashboard /></ProtectedRoutes>} />
           <Route path="/profile" element={<ProtectedRoutes><Profile /></ProtectedRoutes>} />
           <Route path="/resume" element={<ProtectedRoutes><Resume /></ProtectedRoutes>} />
+          <Route path="/settings" element={<ProtectedRoutes><Setting /></ProtectedRoutes>} />
         </Routes>
       </main>
     </div>
