@@ -102,7 +102,7 @@ document.getElementById("saveJob").addEventListener("click", () => {
             // successfully we send it to the backend
             // sending all the details of the job
             console.log("Sending job to backend...");
-            fetch("http://localhost:5000/api/jobs/save", {
+            fetch("https://apply-sync.onrender.com/api/jobs/save", {
               method: "POST",
               headers: { 
                 "Content-Type": "application/json",
