@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../styles/Setting.css";
 
@@ -6,6 +7,12 @@ const Setting = () => {
 	const navigate = useNavigate();
 	const [feedback, setFeedback] = useState("");
 	const [deleteConfirm, setDeleteConfirm] = useState("");
+	const [currentPassword, setCurrentPassword] = useState("");
+	const [newPassword, setNewPassword] = useState("");
+	const [confirmPassword, setConfirmPassword] = useState("");
+	const [savingPassword, setSavingPassword] = useState(false);
+	const [deletingAccount, setDeletingAccount] = useState(false);
+	const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "https://apply-sync.onrender.com";
 	const [preferences, setPreferences] = useState({
 		emailAlerts: true,
 		weeklyDigest: true,
@@ -22,14 +29,76 @@ const Setting = () => {
 		}));
 	};
 
-	const handleChangePassword = (event) => {
+	const handleChangePassword = async (event) => {
 		event.preventDefault();
-		setFeedback("Password update request saved. Please check your email for confirmation.");
+		setFeedback("");
+
+		if (newPassword !== confirmPassword) {
+			setFeedback("New passwords do not match");
+			return;
+		}
+
+		const token = localStorage.getItem("authToken");
+		if (!token) {
+			setFeedback("You are not logged in. Please sign in again.");
+			return;
+		}
+
+		try {
+			setSavingPassword(true);
+			const response = await axios.put(
+				`${apiBaseUrl}/api/auth/password`,
+				{ currentPassword, newPassword, confirmPassword },
+				{
+					headers: {
+						Authorization: `Bearer ${token}`
+					}
+				}
+			);
+			setFeedback(response.data?.message || "Password updated successfully");
+			setCurrentPassword("");
+			setNewPassword("");
+			setConfirmPassword("");
+		} catch (error) {
+			setFeedback(error.response?.data?.message || "Failed to update password");
+		} finally {
+			setSavingPassword(false);
+		}
 	};
 
-	const handleDeleteAccount = (event) => {
+	const handleDeleteAccount = async (event) => {
 		event.preventDefault();
-		setFeedback("Account deletion request submitted. We will follow up by email.");
+		setFeedback("");
+		if (deleteConfirm !== "DELETE") {
+			setFeedback("Type DELETE to confirm account removal");
+			return;
+		}
+
+		const token = localStorage.getItem("authToken");
+		if (!token) {
+			setFeedback("You are not logged in. Please sign in again.");
+			return;
+		}
+
+		try {
+			setDeletingAccount(true);
+			const response = await axios.delete(`${apiBaseUrl}/api/auth/me`, {
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
+			});
+			setFeedback(response.data?.message || "Account deleted successfully");
+			localStorage.removeItem("authToken");
+			localStorage.removeItem("userData");
+			if (typeof chrome !== "undefined" && chrome.runtime) {
+				chrome.runtime.sendMessage({ action: "logout" });
+			}
+			setTimeout(() => navigate("/login"), 800);
+		} catch (error) {
+			setFeedback(error.response?.data?.message || "Failed to delete account");
+		} finally {
+			setDeletingAccount(false);
+		}
 	};
 
 	return (
@@ -74,18 +143,42 @@ const Setting = () => {
 						<form className="settings-form" onSubmit={handleChangePassword}>
 							<label>
 								Current password
-								<input type="password" placeholder="Enter current password" required />
+								<input
+									type="password"
+									placeholder="Enter current password"
+									value={currentPassword}
+									onChange={(event) => setCurrentPassword(event.target.value)}
+									required
+								/>
 							</label>
 							<label>
 								New password
-								<input type="password" placeholder="Use a strong password" required />
+								<input
+									type="password"
+									placeholder="Use a strong password"
+									value={newPassword}
+									onChange={(event) => setNewPassword(event.target.value)}
+									required
+								/>
 							</label>
 							<label>
 								Confirm new password
-								<input type="password" placeholder="Re-enter new password" required />
+								<input
+									type="password"
+									placeholder="Re-enter new password"
+									value={confirmPassword}
+									onChange={(event) => setConfirmPassword(event.target.value)}
+									required
+								/>
 							</label>
 							<div className="settings-actions">
-								<button type="submit" className="btn btn-primary">Update password</button>
+								<button
+									type="submit"
+									className="btn btn-primary"
+									disabled={savingPassword}
+								>
+									{savingPassword ? "Updating..." : "Update password"}
+								</button>
 							</div>
 						</form>
 						<div className="settings-list">
@@ -236,9 +329,9 @@ const Setting = () => {
 								<button
 									type="submit"
 									className="btn btn-danger"
-									disabled={deleteConfirm !== "DELETE"}
+									disabled={deleteConfirm !== "DELETE" || deletingAccount}
 								>
-									Delete account
+									{deletingAccount ? "Deleting..." : "Delete account"}
 								</button>
 							</div>
 						</form>
