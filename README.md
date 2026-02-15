@@ -2,6 +2,10 @@
 
 ApplySync is a comprehensive job application management system that helps users track, organize, and manage job applications across multiple platforms in one centralized dashboard.
 
+## Live Demo
+
+https://apply-sync-snowy.vercel.app/
+
 ## Overview
 
 ApplySync simplifies the entire job application process by allowing users to:
