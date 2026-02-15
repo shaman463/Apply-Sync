@@ -15,6 +15,8 @@ const Dashboard = () => {
   // Control Ui when fetching jobs
   const [isLoadingApps, setIsLoadingApps] = useState(false);
   const [appsError, setAppsError] = useState("");
+  // Track which descriptions are expanded
+  const [expandedDescriptions, setExpandedDescriptions] = useState({});
 
   // This runs once the component is loaded
   useEffect(() => {
@@ -54,12 +56,33 @@ const Dashboard = () => {
     fetchJobs();
   }, []);
 
-  const stats = [
-    { label: "Total Applications", value: 24, icon: "📋", color: "#667eea" },
-    { label: "Interviews", value: 8, icon: "🎤", color: "#764ba2" },
-    { label: "Offers", value: 3, icon: "✨", color: "#f093fb" },
-    { label: "Pending", value: 13, icon: "⏳", color: "#ffa400" },
-  ];
+  // Calculate stats from real data
+  const calculateStats = () => {
+    const total = applications.length;
+    const interviews = applications.filter(app => 
+      (app.status || "").toLowerCase().includes("interview")
+    ).length;
+    const offers = applications.filter(app => 
+      (app.status || "").toLowerCase().includes("offer") ||
+      (app.status || "").toLowerCase().includes("offered")
+    ).length;
+    const pending = applications.filter(app => {
+      const status = (app.status || "").toLowerCase();
+      return !status.includes("offer") && 
+             !status.includes("offered") && 
+             !status.includes("interview") &&
+             !status.includes("rejected");
+    }).length;
+
+    return [
+      { label: "Total Applications", value: total, icon: "📋", color: "#667eea" },
+      { label: "Interviews", value: interviews, icon: "🎤", color: "#764ba2" },
+      { label: "Offers", value: offers, icon: "✨", color: "#f093fb" },
+      { label: "Pending", value: pending, icon: "⏳", color: "#ffa400" },
+    ];
+  };
+
+  const stats = calculateStats();
 
 
   // As the name suggests this is used to handle logout
@@ -127,6 +150,139 @@ const Dashboard = () => {
   const handleViewJob = (url) => {
     if (!url) return;
     window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  // Toggle description expansion
+  const toggleDescription = (appId) => {
+    setExpandedDescriptions(prev => ({
+      ...prev,
+      [appId]: !prev[appId],
+    }));
+  };
+
+  // Clean and format description for better readability
+  const cleanDescription = (description) => {
+    if (!description) return "";
+    return description
+      .replace(/\s+/g, " ") // Remove extra whitespace
+      .trim();
+  };
+
+  // Truncate description to first 150 characters
+  const truncateDescription = (description, limit = 150) => {
+    const cleaned = cleanDescription(description);
+    if (cleaned.length <= limit) return cleaned;
+    return cleaned.substring(0, limit) + "...";
+  };
+
+  // Extract location from description
+  const extractLocation = (description) => {
+    if (!description) return null;
+    const text = description.toLowerCase();
+    
+    // Look for common location patterns
+    const locationPatterns = [
+      /remote/i,
+      /on[\s-]?site/i,
+      /hybrid/i,
+      /work from home/i,
+      /\b(new york|ny|los angeles|la|san francisco|sf|chicago|toronto|london|dubai|bangalore|mumbai|delhi|hyderabad|pune|singapore|sydney)\b/i,
+    ];
+
+    for (const pattern of locationPatterns) {
+      const match = description.match(pattern);
+      if (match) return match[0].trim();
+    }
+    return null;
+  };
+
+  // Extract employment type from description
+  const extractEmploymentType = (description) => {
+    if (!description) return null;
+    const text = description.toLowerCase();
+    
+    const typePatterns = [
+      { regex: /full[\s-]?time/i, label: "Full-time" },
+      { regex: /part[\s-]?time/i, label: "Part-time" },
+      { regex: /contract/i, label: "Contract" },
+      { regex: /internship/i, label: "Internship" },
+      { regex: /temporary/i, label: "Temporary" },
+      { regex: /freelance/i, label: "Freelance" },
+    ];
+
+    for (const pattern of typePatterns) {
+      if (pattern.regex.test(description)) return pattern.label;
+    }
+    return null;
+  };
+
+  // Extract salary from description
+  const extractSalary = (description) => {
+    if (!description) return null;
+    
+    // Look for salary patterns like $50k-$70k, $100,000, ₹50L-₹75L, etc.
+    const salaryPatterns = [
+      /\$[\d,]+[\s-]*(?:to|–|-)?[\s-]*\$?[\d,]+[km]?/i,
+      /₹[\d,]+[\s-]*(?:to|–|-)?[\s-]*₹?[\d,]+[lkm]?/i,
+      /\$[\d,]+(k|m)?/i,
+      /₹[\d,]+(l|k|m)?/i,
+    ];
+
+    for (const pattern of salaryPatterns) {
+      const match = description.match(pattern);
+      if (match) return match[0].trim();
+    }
+    return null;
+  };
+
+  // Extract job title from description
+  const extractJobTitle = (description) => {
+    if (!description) return null;
+    
+    // Look for "Job Title: XYZ" pattern
+    const jobTitleMatch = description.match(/Job\s+Title:\s*([^,\n]+)/i);
+    if (jobTitleMatch && jobTitleMatch[1]) {
+      return jobTitleMatch[1].trim();
+    }
+    
+    // Fallback: Look for common job title patterns
+    const titlePatterns = [
+      /(?:hiring for|looking for|seeking|position of)\s+([^,.\n]+)/i,
+      /\b(senior|junior|lead|principal|staff|associate)?\s*(developer|engineer|manager|designer|analyst|architect|specialist|consultant|director|coordinator|officer)\b/i,
+    ];
+
+    for (const pattern of titlePatterns) {
+      const match = description.match(pattern);
+      if (match) {
+        return match[0].trim();
+      }
+    }
+    return null;
+  };
+
+  // Extract company name from description
+  const extractCompanyName = (description) => {
+    if (!description) return null;
+    
+    // Look for "Company: XYZ" pattern
+    const companyMatch = description.match(/Company:\s*([^,\n]+)/i);
+    if (companyMatch && companyMatch[1]) {
+      return companyMatch[1].trim();
+    }
+    
+    // Fallback: Look for patterns like "at Company", "by Company"
+    const namePatterns = [
+      /(?:at|by|from)\s+([A-Z][A-Za-z\s&]+?)(?:\s+(?:is|are|hiring|seeks|looking)|\.|,|\n)/,
+      /^([A-Z][A-Za-z\s&]+?)(?:\s+(?:is|are|hiring|seeks|looking)|\.|,|\n)/,
+    ];
+
+    for (const pattern of namePatterns) {
+      const match = description.match(pattern);
+      if (match && match[1] && match[1].length > 1 && match[1].length < 50) {
+        return match[1].trim();
+      }
+    }
+    return null;
   };
  // this is our begining of our ui of dashboard
   return (
@@ -203,13 +359,35 @@ const Dashboard = () => {
                   <div className="applications-state">No applications saved yet.</div>
                 )}
                 {!isLoadingApps && !appsError && applications.map((app) => {
-                  const companyName = app.company || "—";
-                  const roleTitle = app.title || "—";
-                  const location = app.location || "Remote";
-                  const salary = app.salaryRange || "Not disclosed";
-                  const employmentType = app.employmentType || "Full-time";
+                  const description = app.description || "No description available.";
+                  
+                  // Use provided values or extract from description
+                  let companyName = app.company || "—";
+                  if (companyName === "—" || !app.company) {
+                    companyName = extractCompanyName(description) || companyName;
+                  }
+                  
+                  let roleTitle = app.title || "—";
+                  if (roleTitle === "—" || !app.title) {
+                    roleTitle = extractJobTitle(description) || roleTitle;
+                  }
+                  
+                  let location = app.location || "Remote";
+                  if (location === "Remote" || !app.location) {
+                    location = extractLocation(description) || location;
+                  }
+                  
+                  let salary = app.salaryRange || "Not disclosed";
+                  if (salary === "Not disclosed" || !app.salaryRange) {
+                    salary = extractSalary(description) || salary;
+                  }
+                  
+                  let employmentType = app.employmentType || "Full-time";
+                  if (employmentType === "Full-time" || !app.employmentType) {
+                    employmentType = extractEmploymentType(description) || employmentType;
+                  }
+                  
                   const source = app.source || "Direct";
-                  const notes = app.notes || "Add a short note to remember why this role stands out.";
 
                   return (
                     <article key={app._id || app.id} className="app-card">
@@ -227,16 +405,7 @@ const Dashboard = () => {
                             <h3 className="role-title">{roleTitle}</h3>
                             <p className="role-subtitle">Applied {formatDate(app.appliedDate || app.savedAt)}</p>
                           </div>
-                        </div>
-                        <div className="status-stack">
-                          <span
-                            className="status-badge"
-                            style={{ backgroundColor: getStatusColor(app.status) }}
-                          >
-                            {formatStatusLabel(app.status)}
-                          </span>
-                          <span className="source-pill">Via {source}</span>
-                        </div>
+                        </div> 
                       </div>
                       <div className="app-meta">
                         <div className="meta-item">
@@ -251,10 +420,41 @@ const Dashboard = () => {
                           <span className="meta-label">Type</span>
                           <span className="meta-value">{employmentType}</span>
                         </div>
+                        <div className="meta-item">
+                          <span className="meta-label">Company</span>
+                          <span className="meta-value">{companyName}</span>
+                        </div>
+                        <div className="meta-item">
+                          <span className="meta-label">Job Title</span>
+                          <span className="meta-value">{roleTitle}</span>
+                        </div>
                       </div>
                       <div className="app-notes">
-                        <span className="meta-label">Notes</span>
-                        <p>{notes}</p>
+                        <span className="meta-label">Description</span>
+                        <p>
+                          {expandedDescriptions[app._id || app.id] 
+                            ? cleanDescription(description)
+                            : truncateDescription(description, 150)
+                          }
+                        </p>
+                        {cleanDescription(description).length > 150 && (
+                          <button
+                            className="toggle-description-btn"
+                            onClick={() => toggleDescription(app._id || app.id)}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              color: "#17a2b8",
+                              cursor: "pointer",
+                              padding: "5px 0",
+                              fontWeight: "500",
+                              fontSize: "14px",
+                              marginTop: "8px",
+                            }}
+                          >
+                            {expandedDescriptions[app._id || app.id] ? "Show Less" : "More"}
+                          </button>
+                        )}
                       </div>
                       <div className="app-actions">
                         <button
