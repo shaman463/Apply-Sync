@@ -31,11 +31,48 @@ function extractJobDetails() {
   }
 
   if (location.href.includes("indeed.com")) {
-    job.title = document.querySelector("h1")?.innerText || "";
-    job.company = document.querySelector(".css-87uc0g")?.innerText || "";
-    job.location = document.querySelector(".css-6z8o9s")?.innerText || "";
-    job.salary = document.querySelector(".css-1rhg65m")?.innerText || "";
-    job.description = document.querySelector("#jobDescriptionText")?.innerText || "";
+    // Log all h1 and h2 elements found
+    const allH1s = Array.from(document.querySelectorAll("h1, h2, [role='heading']"));
+    console.log("🔍 All heading elements found:", allH1s.map(h => ({ tag: h.tagName, text: h.innerText, classes: h.className })));
+    
+    // Try to find title from various sources
+    const titleElement = document.querySelector("h1") ||
+                         document.querySelector("h2[class*='title']") ||
+                         document.querySelector("[data-testid*='title']") ||
+                         document.querySelector(".jobTitle");
+    
+    job.title = titleElement?.innerText?.trim() || "";
+    console.log("📌 Found title element:", titleElement?.innerText, "| Classes:", titleElement?.className);
+    
+    // Company extraction - look for company name link or text
+    const companyElement = document.querySelector("[data-testid='companyPartialName']") ||
+                          document.querySelector("a[href*='companies/']") ||
+                          document.querySelector(".css-87uc0g") ||
+                          document.querySelector("[class*='company']");
+    
+    job.company = companyElement?.innerText?.trim() || "";
+    console.log("🏢 Found company element:", companyElement?.innerText, "| Classes:", companyElement?.className);
+    
+    // Location
+    job.location = document.querySelector("[data-testid='jobLocation']")?.innerText?.trim() ||
+                   document.querySelector(".jobLocation")?.innerText?.trim() || "";
+    console.log("📍 Found location:", job.location);
+    
+    // Salary - check multiple sources
+    const salaryElement = document.querySelector("[data-testid='salary-snippet']") ||
+                         document.querySelector(".salary-snippet-container") ||
+                         document.querySelector(".css-1rhg65m");
+    
+    job.salary = salaryElement?.innerText?.trim() || "";
+    console.log("💰 Found salary:", job.salary);
+    
+    // Description - most important for Groq fallback
+    const descElement = document.querySelector("#jobDescriptionText") ||
+                       document.querySelector(".jobsearch-RichTextSnippet") ||
+                       document.querySelector("[data-testid='jobDetailSection']");
+    
+    job.description = descElement?.innerText?.trim() || "";
+    console.log("📝 Found description length:", job.description?.length || 0);
   }
 
   if (location.href.includes("linkedin.com/jobs")) {

@@ -39,7 +39,7 @@ router.post("/save", verifyToken, async (req, res) => {
             return res.status(400).json({ message: "URL is required" });
         }
 
-        // Sanitize incoming data
+        // Sanitize incoming data (but we'll let Groq extract from description anyway)
         let cleanData = sanitizeJobData({
             title,
             company,
@@ -48,20 +48,22 @@ router.post("/save", verifyToken, async (req, res) => {
         });
         console.log("🧹 Sanitized incoming data:", cleanData);
 
-        // Extract missing details from description using Groq LLM
+        // Always extract from description using Groq LLM - description has all the info
         if (description) {
-            console.log("🔍 Starting Groq extraction...");
-            const extracted = await extractJobDetails(description, cleanData);
-            console.log("✅ Extraction complete, result:", extracted);
+            console.log("🔍 Starting Groq extraction from description...");
+            // Pass empty object to force Groq to extract everything from description
+            const extracted = await extractJobDetails(description, {});
+            console.log("✅ Groq extraction complete, result:", extracted);
             
             // Sanitize extracted data
             const sanitizedExtracted = sanitizeJobData(extracted);
 
-            // Use extracted values if not already provided
-            cleanData.title = cleanData.title || sanitizedExtracted.title;
-            cleanData.company = cleanData.company || sanitizedExtracted.company;
-            cleanData.location = cleanData.location || sanitizedExtracted.location;
-            cleanData.salary = cleanData.salary || sanitizedExtracted.salary;
+            // Use Groq-extracted values (they're more accurate from full description)
+            // Only use provided values as final fallback
+            cleanData.title = sanitizedExtracted.title || cleanData.title;
+            cleanData.company = sanitizedExtracted.company || cleanData.company;
+            cleanData.location = sanitizedExtracted.location || cleanData.location;
+            cleanData.salary = sanitizedExtracted.salary || cleanData.salary;
         }
 
         // Final fallbacks with defaults
