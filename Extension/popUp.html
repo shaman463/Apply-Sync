@@ -39,9 +39,22 @@
   </head>
   <body>
     <h3>Save Job to ApplySync</h3>
+    <label style="display: block; margin-bottom: 8px; font-size: 12px; color: #666;">
+      API Base URL
+      <input
+        id="apiBaseUrl"
+        type="text"
+        placeholder="https://your-api-url"
+        style="width: 100%; margin-top: 6px; padding: 6px; border: 1px solid #ddd; border-radius: 4px;"
+      />
+    </label>
+    <button id="saveApiBaseUrl" style="width: 100%; margin-bottom: 12px; padding: 6px; border: 1px solid #ddd; border-radius: 4px; background: #f5f5f5; cursor: pointer;">
+      Save API URL
+    </button>
     <button id="saveJob">Save Job</button>
     <div id="status"></div>
 
+    <script src="config.js"></script>
     <script src="popUp.js"></script>
   </body>
 </html>

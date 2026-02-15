@@ -1,3 +1,31 @@
+const defaultApiBaseUrl =
+  typeof window !== "undefined" && window.APPLYSYNC_API_BASE_URL
+    ? window.APPLYSYNC_API_BASE_URL
+    : "https://apply-sync.onrender.com";
+
+const normalizeApiBaseUrl = (value) => (value || "").replace(/\/+$/, "");
+
+const apiBaseUrlInput = document.getElementById("apiBaseUrl");
+const saveApiBaseUrlButton = document.getElementById("saveApiBaseUrl");
+
+if (apiBaseUrlInput && saveApiBaseUrlButton) {
+  chrome.storage.local.get(["apiBaseUrl"], (result) => {
+    const stored = normalizeApiBaseUrl(result?.apiBaseUrl) || defaultApiBaseUrl;
+    apiBaseUrlInput.value = stored;
+  });
+
+  saveApiBaseUrlButton.addEventListener("click", () => {
+    const nextValue = normalizeApiBaseUrl(apiBaseUrlInput.value) || defaultApiBaseUrl;
+    chrome.storage.local.set({ apiBaseUrl: nextValue }, () => {
+      const statusDiv = document.getElementById("status");
+      if (statusDiv) {
+        statusDiv.textContent = "API URL saved.";
+        statusDiv.style.color = "green";
+      }
+    });
+  });
+}
+
 // This here starts the entire extraction of our project
 document.getElementById("saveJob").addEventListener("click", () => {
   const statusDiv = document.getElementById("status");
@@ -101,15 +129,17 @@ document.getElementById("saveJob").addEventListener("click", () => {
             // meaning after receiving the tokene from background 
             // successfully we send it to the backend
             // sending all the details of the job
-            console.log("Sending job to backend...");
-            fetch("https://apply-sync.onrender.com/api/jobs/save", {
-              method: "POST",
-              headers: { 
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${authToken}`
-              },
-              body: JSON.stringify(jobData),
-            }).then(apiResponse => {
+            chrome.storage.local.get(["apiBaseUrl"], (result) => {
+              const apiBaseUrl = normalizeApiBaseUrl(result?.apiBaseUrl) || defaultApiBaseUrl;
+              console.log("Sending job to backend...", apiBaseUrl);
+              fetch(`${apiBaseUrl}/api/jobs/save`, {
+                method: "POST",
+                headers: { 
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${authToken}`
+                },
+                body: JSON.stringify(jobData),
+              }).then(apiResponse => {
               // converting it to text
               return apiResponse.text().then(responseText => {
                 console.log("API Response Status:", apiResponse.status);
@@ -148,6 +178,7 @@ document.getElementById("saveJob").addEventListener("click", () => {
               statusDiv.textContent = "Network error: " + error.message;
               statusDiv.style.color = "red";
               saveBtn.disabled = false;
+            });
             });
           });
         }

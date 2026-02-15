@@ -4,6 +4,7 @@ import { MDBContainer, MDBRow, MDBCol, MDBCard, MDBCardBody, MDBInput, MDBIcon }
 import '../styles/LoginPage.css';
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from '@react-oauth/google';
+import { apiBaseUrl } from "../Services/apiBaseUrl";
 
 
 function SignUpPage() {
@@ -16,7 +17,6 @@ function SignUpPage() {
     });
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "https://apply-sync.onrender.com";
 
     const handleGoogleSuccess = async (credentialResponse) => {
         try {
@@ -215,6 +215,16 @@ function SignUpPage() {
                                     />
                                 </div>
                             </form>
+
+                            <div style={{ marginTop: '20px', textAlign: 'center', fontSize: '14px' }}>
+                                <span style={{ color: '#666' }}>Already have an account? </span>
+                                <span
+                                    onClick={() => navigate('/login')}
+                                    style={{ color: '#4285f4', cursor: 'pointer', fontWeight: '600' }}
+                                >
+                                    Login
+                                </span>
+                            </div>
                         </MDBCardBody>
                     </MDBCard>
                 </MDBCol>

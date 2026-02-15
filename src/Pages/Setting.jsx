@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { apiBaseUrl } from "../Services/apiBaseUrl";
 import "../styles/Setting.css";
 
 const Setting = () => {
@@ -12,7 +13,6 @@ const Setting = () => {
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [savingPassword, setSavingPassword] = useState(false);
 	const [deletingAccount, setDeletingAccount] = useState(false);
-	const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "https://apply-sync.onrender.com";
 	const [preferences, setPreferences] = useState({
 		emailAlerts: true,
 		weeklyDigest: true,

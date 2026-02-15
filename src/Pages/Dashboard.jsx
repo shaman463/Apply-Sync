@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { apiBaseUrl } from "../Services/apiBaseUrl";
 import "../styles/Dashboard.css";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "https://apply-sync.onrender.com";
   // It controls which tab is visible i.e., overview, applications, interviews
   const [activeTab, setActiveTab] = useState("overview");
   // Controls whether profile panel is visible on the right side

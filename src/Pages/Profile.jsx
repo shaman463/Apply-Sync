@@ -3,12 +3,26 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/Profile.css";
 
+// Helper function to format date for input (YYYY-MM-DD)
+const formatDateForInput = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return "";
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 const Profile = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState({
     FirstName: "",
     LastName: "",
     email: "",
+    contact: "",
+    gender: "",
+    dob: "",
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -21,6 +35,10 @@ const Profile = () => {
     if (storedData) {
       try {
         const parsed = JSON.parse(storedData);
+        // Format date properly for input binding
+        if (parsed.dob) {
+          parsed.dob = formatDateForInput(parsed.dob);
+        }
         setUserData(parsed);
         setFormData(parsed);
       } catch (err) {
@@ -88,9 +106,6 @@ const Profile = () => {
           </button>
           <h1>My Profile</h1>
         </div>
-        <button className="logout-btn" onClick={handleLogout}>
-          Logout
-        </button>
       </header>
 
       {/* Main Content */}
@@ -133,6 +148,18 @@ const Profile = () => {
                 <label>Email</label>
                 <p>{userData.email || "—"}</p>
               </div>
+              <div className="info-group">
+                <label>Contact No</label>
+                <p>{userData.contact || "—"}</p>
+              </div>
+              <div className="info-group">
+                <label>Gender</label>
+                <p>{userData.gender || "—"}</p>
+              </div>
+              <div className="info-group">
+                <label>Date of Birth</label>
+                <p>{userData.dob ? new Date(userData.dob).toLocaleDateString() : "—"}</p>
+              </div>
 
               <button className="btn-primary" onClick={() => setIsEditing(true)}>
                 Edit Profile
@@ -172,6 +199,49 @@ const Profile = () => {
                   value={formData.email}
                   onChange={handleInputChange} placeholder="Enter email" required disabled />
                 <small>Email cannot be changed</small>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="contact">Contact No</label>
+                <input
+                  type="tel"
+                  id="contact"
+                  name="contact"
+                  value={formData.contact}
+                  onChange={handleInputChange}
+                  placeholder="Enter contact number"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="gender">Gender</label>
+                <select
+                  id="gender"
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleInputChange}
+                >
+                  <option value="">Select gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                  <option value="Prefer not to say">Prefer not to say</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="dob">Date of Birth</label>
+                <input
+                  type="date"
+                  id="dob"
+                  name="dob"
+                  value={formData.dob || ""}
+                  onChange={handleInputChange}
+                  disabled={formData.dob && formData.dob.trim() !== ""}
+                />
+                <small style={{ color: "#666" }}>
+                  {formData.dob && formData.dob.trim() ? "Date of birth cannot be changed" : "Set your date of birth"}
+                </small>
               </div>
 
               <div className="form-actions">

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { apiBaseUrl } from "../Services/apiBaseUrl";
 import "../styles/Resume.css";
 
 const Resume = () => {
@@ -7,7 +8,6 @@ const Resume = () => {
   const [previewUrl, setPreviewUrl] = useState("");
   const [scoreData, setScoreData] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "https://apply-sync.onrender.com";
 
   const scoreItems = scoreData
     ? [
