@@ -1,29 +1,100 @@
 import express from "express"
 import { prisma } from "../config/db.js"
 import { verifyToken } from "../middleware/auth.js"
+import { extractJobDetails } from "../utils/extractJobDetails.js"
 
 const router = express.Router();
 
+// Helper function to sanitize extracted data
+const sanitizeJobData = (data) => {
+  const sanitize = (value) => {
+    // Ensure it's a string, not an object
+    if (typeof value === 'string') return value.trim();
+    if (typeof value === 'number') return String(value);
+    // If it's an object or anything else, return empty string
+    return '';
+  };
+
+  return {
+    title: sanitize(data.title),
+    company: sanitize(data.company),
+    location: sanitize(data.location),
+    salary: sanitize(data.salary),
+  };
+};
+
 // Save a new job (requires authentication)
 router.post("/save", verifyToken, async (req, res) => {
+    const saveStartTime = Date.now();
+    console.log("\n📌 JOB SAVE REQUEST START at", new Date().toISOString());
     try {
-        const { title, company, location, salary, description, url } = req.body;
+        let { title, company, location, salary, description, url, salaryRange, employmentType, status } = req.body;
+        console.log("📥 Received data:", { title, company, location, salary, url });
 
-        if (!title || !url) {
-            return res.status(400).json({ message: "Title and URL are required" });
+        if (!title && !description) {
+            return res.status(400).json({ message: "At least title or description is required" });
         }
+
+        if (!url) {
+            return res.status(400).json({ message: "URL is required" });
+        }
+
+        // Sanitize incoming data
+        let cleanData = sanitizeJobData({
+            title,
+            company,
+            location,
+            salary: salary || salaryRange,
+        });
+        console.log("🧹 Sanitized incoming data:", cleanData);
+
+        // Extract missing details from description using Groq LLM
+        if (description) {
+            console.log("🔍 Starting Groq extraction...");
+            const extracted = await extractJobDetails(description, cleanData);
+            console.log("✅ Extraction complete, result:", extracted);
+            
+            // Sanitize extracted data
+            const sanitizedExtracted = sanitizeJobData(extracted);
+
+            // Use extracted values if not already provided
+            cleanData.title = cleanData.title || sanitizedExtracted.title;
+            cleanData.company = cleanData.company || sanitizedExtracted.company;
+            cleanData.location = cleanData.location || sanitizedExtracted.location;
+            cleanData.salary = cleanData.salary || sanitizedExtracted.salary;
+        }
+
+        // Final fallbacks with defaults
+        const finalData = {
+            title: cleanData.title || "Job Title",
+            company: cleanData.company || "Unknown Company",
+            location: cleanData.location || "Not specified",
+            salary: cleanData.salary || "Not disclosed",
+        };
+
+        console.log("✓ Final job data to save:", finalData);
+        
+        const now = new Date();
+        console.log("💾 Saving job to database at", now.toISOString());
 
         const savedJob = await prisma.job.create({
             data: {
                 userId: req.userId,
-                title,
-                company,
-                location,
-                salary,
-                description,
-                url
+                title: finalData.title,
+                company: finalData.company,
+                location: finalData.location,
+                salary: finalData.salary,
+                description: description || "",
+                url,
+                status: status || "saved",
+                appliedDate: new Date()
             }
         });
+
+        const saveEndTime = Date.now();
+        console.log("✅ Job saved successfully in", saveEndTime - saveStartTime, "ms");
+        console.log("💾 Saved job ID:", savedJob.id);
+        console.log("📌 JOB SAVE REQUEST END at", new Date().toISOString(), "\n");
 
         res.status(201).json({
             message: "Job saved successfully",
@@ -31,7 +102,10 @@ router.post("/save", verifyToken, async (req, res) => {
         });
     }
     catch (error) {
-        console.error("Error saving job:", error);
+        const errorTime = Date.now();
+        console.error("❌ Error saving job:", error.message);
+        console.error("Full error:", error);
+        console.error("📌 JOB SAVE REQUEST FAILED after", errorTime - saveStartTime, "ms at", new Date().toISOString(), "\n");
         res.status(500).json({ message: "Server error", error: error.message });
     }
 });
