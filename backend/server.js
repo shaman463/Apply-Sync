@@ -16,7 +16,8 @@ app.use(morgan("combined"));
 const defaultOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
-  "http://localhost:8000"
+  "http://localhost:8000",
+  "https://apply-sync-snowy.vercel.app"
 ];
 
 const envOrigins = (process.env.CORS_ORIGINS || "")
