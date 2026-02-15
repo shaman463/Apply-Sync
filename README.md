@@ -4,7 +4,7 @@ ApplySync is a job application management system that helps users track, organiz
 
 ## Live Demo
 
-https://apply-sync-snowy.vercel.app/
+[Click here](https://apply-sync-snowy.vercel.app/)
 
 ## What It Does
 
