@@ -11,6 +11,7 @@ const LoginPage = () => {
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "https://apply-sync.onrender.com";
 
     const handleGoogleSuccess = async (credentialResponse) => {
         try {
@@ -20,7 +21,7 @@ const LoginPage = () => {
                 return;
             }
 
-            const res = await axios.post("http://localhost:5000/api/auth/google", {
+            const res = await axios.post(`${apiBaseUrl}/api/auth/google`, {
                 credential
             });
 
@@ -61,7 +62,7 @@ const LoginPage = () => {
         setMessage("");
 
         try {
-            const res = await axios.post("http://localhost:5000/api/auth/login", {
+            const res = await axios.post(`${apiBaseUrl}/api/auth/login`, {
                 email,
                 password,
             });

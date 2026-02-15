@@ -5,6 +5,7 @@ import "../styles/Dashboard.css";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "https://apply-sync.onrender.com";
   // It controls which tab is visible i.e., overview, applications, interviews
   const [activeTab, setActiveTab] = useState("overview");
   // Controls whether profile panel is visible on the right side
@@ -32,7 +33,7 @@ const Dashboard = () => {
       // It fetched the jobs from the backend 
       // it sends to jwt token the backend verifies the user  and return the jobs
       try {
-        const res = await axios.get("http://localhost:5000/api/jobs", {
+        const res = await axios.get(`${apiBaseUrl}/api/jobs`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

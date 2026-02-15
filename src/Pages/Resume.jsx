@@ -7,7 +7,7 @@ const Resume = () => {
   const [previewUrl, setPreviewUrl] = useState("");
   const [scoreData, setScoreData] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "https://apply-sync.onrender.com";
 
   const scoreItems = scoreData
     ? [

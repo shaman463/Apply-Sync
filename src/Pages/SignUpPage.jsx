@@ -16,6 +16,7 @@ function SignUpPage() {
     });
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "https://apply-sync.onrender.com";
 
     const handleGoogleSuccess = async (credentialResponse) => {
         try {
@@ -25,7 +26,7 @@ function SignUpPage() {
                 return;
             }
 
-            const res = await axios.post("http://localhost:5000/api/auth/google", {
+            const res = await axios.post(`${apiBaseUrl}/api/auth/google`, {
                 credential
             });
 
@@ -73,7 +74,7 @@ function SignUpPage() {
         setMessage("");
 
         try {
-            const res = await axios.post("http://localhost:5000/api/auth/signup", {
+            const res = await axios.post(`${apiBaseUrl}/api/auth/signup`, {
                 FirstName: formData.firstName,
                 LastName: formData.lastName,
                 email: formData.email,

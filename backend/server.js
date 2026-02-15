@@ -13,34 +13,40 @@ const app = express();
 app.use(helmet());
 app.use(morgan("combined"));
 
+const defaultOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "http://localhost:8000"
+];
+
+const envOrigins = (process.env.CORS_ORIGINS || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const allowedOrigins = envOrigins.length > 0 ? envOrigins : defaultOrigins;
+
 // CORS Configuration - Accept requests from extension and web app
 app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps, Postman, curl requests)
     if (!origin) return callback(null, true);
-    
-    // Allowed origins
-    const allowedOrigins = [
-      "http://localhost:5173",
-      "http://localhost:3000",
-      "http://localhost:8000"
-    ];
-    
+
     // Allow all chrome extensions
     if (origin.startsWith("chrome-extension://")) {
       return callback(null, true);
     }
-    
+
     // Check if origin is in allowed list
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    
+
     // Default: allow in development
     if (process.env.NODE_ENV === "development") {
       return callback(null, true);
     }
-    
+
     callback(new Error("Not allowed by CORS"));
   },
   credentials: true,
