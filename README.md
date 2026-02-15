@@ -1,66 +1,44 @@
 # ApplySync
 
-ApplySync is a comprehensive job application management system that helps users track, organize, and manage job applications across multiple platforms in one centralized dashboard.
+ApplySync is a job application management system that helps users track, organize, and manage applications across multiple platforms from a single dashboard.
 
 ## Live Demo
 
 https://apply-sync-snowy.vercel.app/
 
-## Overview
+## What It Does
 
-ApplySync simplifies the entire job application process by allowing users to:
-- Extract job details from job websites using a Chrome extension
-- Track application statuses (saved, applied, rejected, offered)
-- Monitor interview schedules and deadlines
-- Manage profiles and application history
-- Sync data across all platforms seamlessly
+- Collects job details from job boards via a Chrome extension
+- Tracks application status (saved, applied, rejected, offered)
+- Organizes interviews, deadlines, and notes
+- Provides a dashboard with quick insights
+- Keeps data in sync across the web app and extension
 
 ## Tech Stack
 
-### Frontend
-- **React 19** - UI framework
-- **Vite** - Build tool
-- **React Router** - Navigation
-- **Axios** - HTTP client
-- **MDB React UI Kit** - UI components
-- **TailwindCSS** - Styling
+| Layer | Tools |
+| --- | --- |
+| Frontend | React, Vite, React Router, Axios, MDB React UI Kit, TailwindCSS |
+| Backend | Node.js, Express, PostgreSQL, Prisma, JWT, Google OAuth |
+| Extension | Chrome Extension API |
 
-### Backend
-- **Node.js & Express** - Server framework
-- **PostgreSQL** - Database (via Neon)
-- **Prisma** - ORM
-- **JWT** - Authentication
-- **Google OAuth** - Social login
-
-### Browser Extension
-- **Chrome Extension API** - Job extraction and token management
-
-## Features
-
-✅ User authentication (Email/Password & Google OAuth)  
-✅ Job Application Tracking with status management  
-✅ Chrome Extension for one-click job saving  
-✅ Dashboard with application overview & statistics  
-✅ Interview schedule management  
-✅ User profile management  
-✅ Protected routes and JWT-based authentication  
-
-## Getting Started
+## Quick Start
 
 ### Prerequisites
+
 - Node.js 16+
-- PostgreSQL database (or Neon)
+- PostgreSQL database
 - Google OAuth Client ID
 
-### Installation
+### Install
 
-#### Frontend & Backend Setup
 ```bash
-# Install dependencies
 npm install
 cd backend && npm install && cd ..
+```
 
-#### Run Development Servers
+### Run Locally
+
 ```bash
 # Terminal 1: Frontend (port 5173)
 npm run dev
@@ -69,12 +47,12 @@ npm run dev
 cd backend && npm start
 ```
 
-#### Install Chrome Extension
-1. Go to `chrome://extensions/`
-2. Enable "Developer mode"
-3. Click "Load unpacked"
-4. Select the `Extension/` folder
+### Install Chrome Extension
 
+1. Open `chrome://extensions/`
+2. Enable Developer mode
+3. Click Load unpacked
+4. Select the `Extension/` folder
 
 ## Contributing
 
