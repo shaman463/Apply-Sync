@@ -35,3 +35,17 @@ model Job {
 
   @@index([userId])
 }
+
+model SupportMessage {
+  id        String   @id @default(uuid())
+  name      String?
+  email     String?
+  topic     String?
+  message   String
+  source    String   @default("support")
+  userId    String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}

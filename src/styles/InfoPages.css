@@ -170,6 +170,16 @@
   filter: brightness(1.05);
 }
 
+.info-banner {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(20, 184, 166, 0.12);
+  color: #0f766e;
+  font-weight: 600;
+  border: 1px solid rgba(20, 184, 166, 0.2);
+  font-size: 0.9rem;
+}
+
 @media (max-width: 800px) {
   .info-hero {
     flex-direction: column;

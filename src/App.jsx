@@ -11,6 +11,8 @@ import About from './Pages/About';
 import Services from './Pages/Services';
 import Contact from './Pages/Contact';
 import Setting from './Pages/Setting';
+import Support from './Pages/Support';
+import Privacy from './Pages/Privacy';
 import './App.css';
 
 function AppContent() {
@@ -30,6 +32,8 @@ function AppContent() {
           <Route path="/about" element={<About />} />
           <Route path="/services" element={<Services />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/support" element={<Support />} />
+          <Route path="/privacy" element={<Privacy />} />
 
           {/* Dashboard Protected  */}
           <Route path="/dashboard" element={<ProtectedRoutes><Dashboard /></ProtectedRoutes>} />

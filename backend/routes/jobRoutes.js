@@ -173,6 +173,17 @@ router.get("/status/:status", verifyToken, async (req, res) => {
     }
 });
 
+// Clear activity history (delete all jobs for user)
+router.delete("/history", verifyToken, async (req, res) => {
+    try {
+        await prisma.job.deleteMany({ where: { userId: req.userId } });
+        res.json({ message: "Activity history cleared" });
+    } catch (error) {
+        console.error("Error clearing activity history:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+});
+
 // Get single job by ID
 router.get("/:id", verifyToken, async (req, res) => {
     try {

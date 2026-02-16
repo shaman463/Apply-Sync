@@ -13,6 +13,8 @@ const Setting = () => {
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [savingPassword, setSavingPassword] = useState(false);
 	const [deletingAccount, setDeletingAccount] = useState(false);
+	const [exportingData, setExportingData] = useState(false);
+	const [clearingHistory, setClearingHistory] = useState(false);
 	const [preferences, setPreferences] = useState({
 		emailAlerts: true,
 		weeklyDigest: true,
@@ -101,6 +103,68 @@ const Setting = () => {
 		}
 	};
 
+	const handleExportData = async () => {
+		setFeedback("");
+		const token = localStorage.getItem("authToken");
+		if (!token) {
+			setFeedback("You are not logged in. Please sign in again.");
+			return;
+		}
+
+		try {
+			setExportingData(true);
+			const response = await axios.get(`${apiBaseUrl}/api/jobs`, {
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
+			});
+			const payload = {
+				exportedAt: new Date().toISOString(),
+				jobs: response.data?.jobs || []
+			};
+			const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement("a");
+			link.href = url;
+			link.download = `applysync-export-${new Date().toISOString().slice(0, 10)}.json`;
+			document.body.appendChild(link);
+			link.click();
+			link.remove();
+			URL.revokeObjectURL(url);
+			setFeedback("Export ready. Your download should start automatically.");
+		} catch (error) {
+			setFeedback(error.response?.data?.message || "Failed to export data");
+		} finally {
+			setExportingData(false);
+		}
+	};
+
+	const handleClearHistory = async () => {
+		setFeedback("");
+		const token = localStorage.getItem("authToken");
+		if (!token) {
+			setFeedback("You are not logged in. Please sign in again.");
+			return;
+		}
+
+		const confirmed = window.confirm("Clear activity history? This removes all saved applications.");
+		if (!confirmed) return;
+
+		try {
+			setClearingHistory(true);
+			const response = await axios.delete(`${apiBaseUrl}/api/jobs/history`, {
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
+			});
+			setFeedback(response.data?.message || "Activity history cleared");
+		} catch (error) {
+			setFeedback(error.response?.data?.message || "Failed to clear activity history");
+		} finally {
+			setClearingHistory(false);
+		}
+	};
+
 	return (
 		<div className="dashboard settings-page">
 			<header className="dashboard-header settings-header">
@@ -182,17 +246,6 @@ const Setting = () => {
 							</div>
 						</form>
 						<div className="settings-list">
-							<label className="settings-toggle">
-								<div>
-									<strong>Two-factor authentication</strong>
-									<span>Add an extra layer of security to your account.</span>
-								</div>
-								<input
-									type="checkbox"
-									checked={preferences.twoFactor}
-									onChange={() => handleToggle("twoFactor")}
-								/>
-							</label>
 							<div className="settings-support">
 								<div>
 									<strong>Active sessions</strong>
@@ -276,14 +329,24 @@ const Setting = () => {
 									<strong>Support center</strong>
 									<span>Get help with billing, resumes, and job tracking.</span>
 								</div>
-								<button className="btn btn-outline">Open support</button>
+								<button
+									className="btn btn-outline"
+									onClick={() => navigate("/support")}
+								>
+									Open support
+								</button>
 							</div>
 							<div className="settings-support">
 								<div>
 									<strong>Privacy policy</strong>
 									<span>Review how we protect your information.</span>
 								</div>
-								<button className="btn btn-outline">View policy</button>
+								<button
+									className="btn btn-outline"
+									onClick={() => navigate("/privacy")}
+								>
+									View policy
+								</button>
 							</div>
 						</div>
 					</section>
@@ -297,14 +360,26 @@ const Setting = () => {
 								<strong>Download my data</strong>
 								<span>Export applications, resumes, and activity history.</span>
 							</div>
-							<button className="btn btn-secondary">Request export</button>
+							<button
+								className="btn btn-secondary"
+								onClick={handleExportData}
+								disabled={exportingData}
+							>
+								{exportingData ? "Preparing..." : "Request export"}
+							</button>
 						</div>
 						<div className="settings-support">
 							<div>
-								<strong>Clear activity history</strong>
+								<strong>Clear Data & History</strong>
 								<span>Remove cached search and tracking history.</span>
 							</div>
-							<button className="btn btn-ghost">Clear history</button>
+							<button
+								className="btn btn-ghost"
+								onClick={handleClearHistory}
+								disabled={clearingHistory}
+							>
+								{clearingHistory ? "Clearing..." : "Clear history"}
+							</button>
 						</div>
 					</section>
 

@@ -49,10 +49,11 @@ cd backend && npm start
 
 ### Install Chrome Extension
 
-1. Open `chrome://extensions/`
-2. Enable Developer mode
-3. Click Load unpacked
-4. Select the `Extension/` folder
+1. Download or clone the repo and unzip it if needed.
+2. Open `chrome://extensions/`
+3. Enable Developer mode
+4. Click Load unpacked
+5. Select the `Extension/` folder from the project root
 
 ## Contributing
 

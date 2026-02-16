@@ -1,6 +1,43 @@
+import { useState } from "react";
+import axios from "axios";
+import { apiBaseUrl } from "../Services/apiBaseUrl";
 import "../styles/InfoPages.css";
 
 const Contact = () => {
+	const [fullName, setFullName] = useState("");
+	const [email, setEmail] = useState("");
+	const [message, setMessage] = useState("");
+	const [feedback, setFeedback] = useState("");
+	const [sending, setSending] = useState(false);
+
+	const handleSubmit = async (event) => {
+		event.preventDefault();
+		setFeedback("");
+
+		if (!message.trim()) {
+			setFeedback("Please add a short message.");
+			return;
+		}
+
+		try {
+			setSending(true);
+			await axios.post(`${apiBaseUrl}/api/support/messages`, {
+				name: fullName,
+				email,
+				message,
+				source: "contact",
+			});
+			setFeedback("Thanks! We will reply soon.");
+			setFullName("");
+			setEmail("");
+			setMessage("");
+		} catch (error) {
+			setFeedback(error.response?.data?.message || "Unable to send your message.");
+		} finally {
+			setSending(false);
+		}
+	};
+
 	return (
 		<main className="info-page">
 			<section className="info-hero">
@@ -29,21 +66,37 @@ const Contact = () => {
 					<p>Phone: +1 (555) 014-2024</p>
 					<p>Location: Remote-first, worldwide</p>
 				</div>
-				<form className="info-form">
+				<form className="info-form" onSubmit={handleSubmit}>
 					<label>
 						Full name
-						<input type="text" placeholder="Jane Doe" />
+						<input
+							type="text"
+							placeholder="Jane Doe"
+							value={fullName}
+							onChange={(event) => setFullName(event.target.value)}
+						/>
 					</label>
 					<label>
 						Email
-						<input type="email" placeholder="jane@email.com" />
+						<input
+							type="email"
+							placeholder="jane@email.com"
+							value={email}
+							onChange={(event) => setEmail(event.target.value)}
+						/>
 					</label>
 					<label>
 						Message
-						<textarea rows="4" placeholder="Tell us how we can help." />
+						<textarea
+							rows="4"
+							placeholder="Tell us how we can help."
+							value={message}
+							onChange={(event) => setMessage(event.target.value)}
+						/>
 					</label>
-					<button type="button" className="info-button">
-						Send message
+					{feedback && <div className="info-banner">{feedback}</div>}
+					<button type="submit" className="info-button" disabled={sending}>
+						{sending ? "Sending..." : "Send message"}
 					</button>
 				</form>
 			</section>
