@@ -152,6 +152,37 @@ const Dashboard = () => {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
+  const handleDeleteJob = async (jobId) => {
+    if (!jobId) return;
+
+    const confirmed = window.confirm("Delete this job card?");
+    if (!confirmed) return;
+
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      setAppsError("Please log in to delete applications.");
+      return;
+    }
+
+    try {
+      await axios.delete(`${apiBaseUrl}/api/jobs/${jobId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setApplications((prev) => prev.filter((app) => (app.id || app._id) !== jobId));
+      setExpandedDescriptions((prev) => {
+        const next = { ...prev };
+        delete next[jobId];
+        return next;
+      });
+    } catch (error) {
+      console.error("Error deleting job:", error);
+      setAppsError("Unable to delete application. Please try again.");
+    }
+  };
+
   // Toggle description expansion
   const toggleDescription = (appId) => {
     setExpandedDescriptions(prev => ({
@@ -163,9 +194,44 @@ const Dashboard = () => {
   // Clean and format description for better readability
   const cleanDescription = (description) => {
     if (!description) return "";
-    return description
-      .replace(/\s+/g, " ") // Remove extra whitespace
+    const withoutLabels = description.replace(
+      /^\s*(Job\s*Title|Company|Company\s+Location|Location|Pay|Salary)\s*:\s*.*$/gim,
+      ""
+    );
+    return withoutLabels
+      .replace(/\s+/g, " ")
       .trim();
+  };
+
+  const normalizeText = (value) => (value ?? "").toString().trim();
+
+  const isMissingValue = (value) => {
+    const normalized = normalizeText(value).toLowerCase();
+    if (!normalized) return true;
+    return [
+      "—",
+      "-",
+      "na",
+      "n/a",
+      "none",
+      "unknown",
+      "not specified",
+      "not disclosed",
+    ].includes(normalized);
+  };
+
+  const looksLikeSourceTitle = (value, source) => {
+    const normalized = normalizeText(value).toLowerCase();
+    if (!normalized) return false;
+    if (normalized === "indeed") return true;
+    if (source && normalized === normalizeText(source).toLowerCase()) return true;
+    return false;
+  };
+
+  const looksLikeCompanyWithLocation = (value) => {
+    const normalized = normalizeText(value);
+    if (!normalized) return false;
+    return normalized.includes("\n") || /,\s*(delhi|mumbai|punjab|hyderabad|bangalore|chandigarh|mohali|kurukshetra|india)\b/i.test(normalized);
   };
 
   // Truncate description to first 150 characters
@@ -362,24 +428,32 @@ const Dashboard = () => {
                   const description = app.description || "No description available.";
                   
                   // Use provided values or extract from description
+                  const derivedCompany = extractCompanyName(description);
+                  const derivedTitle = extractJobTitle(description);
+                  const derivedLocation = extractLocation(description);
+                  const derivedSalary = extractSalary(description);
+
                   let companyName = app.company || "—";
-                  if (companyName === "—" || !app.company) {
-                    companyName = extractCompanyName(description) || companyName;
+                  if (looksLikeCompanyWithLocation(companyName)) {
+                    companyName = normalizeText(companyName.split("\n")[0]);
+                  }
+                  if (isMissingValue(companyName) || (derivedCompany && looksLikeCompanyWithLocation(companyName))) {
+                    companyName = derivedCompany || companyName;
                   }
                   
                   let roleTitle = app.title || "—";
-                  if (roleTitle === "—" || !app.title) {
-                    roleTitle = extractJobTitle(description) || roleTitle;
+                  if (isMissingValue(roleTitle) || looksLikeSourceTitle(roleTitle, app.source)) {
+                    roleTitle = derivedTitle || roleTitle;
                   }
                   
                   let location = app.location || "Remote";
-                  if (location === "Remote" || !app.location) {
-                    location = extractLocation(description) || location;
+                  if (isMissingValue(location) || normalizeText(location).toLowerCase() === "remote") {
+                    location = derivedLocation || location;
                   }
                   
-                  let salary = app.salaryRange || "Not disclosed";
-                  if (salary === "Not disclosed" || !app.salaryRange) {
-                    salary = extractSalary(description) || salary;
+                  let salary = app.salaryRange || app.salary || "Not disclosed";
+                  if (isMissingValue(salary)) {
+                    salary = derivedSalary || salary;
                   }
                   
                   let employmentType = app.employmentType || "Full-time";
@@ -457,6 +531,23 @@ const Dashboard = () => {
                         )}
                       </div>
                       <div className="app-actions">
+                        <button
+                          className="delete-btn"
+                          onClick={() => handleDeleteJob(app.id || app._id)}
+                          aria-label="Delete job"
+                          type="button"
+                        >
+                          <svg
+                            className="delete-icon"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                          >
+                            <path
+                              d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v9h-2V9zm4 0h2v9h-2V9zM6 7h12l-1 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 7z"
+                              fill="currentColor"
+                            />
+                          </svg>
+                        </button>
                         <button
                           className="action-btn"
                           onClick={() => handleViewJob(app.url)}

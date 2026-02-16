@@ -1,165 +1,186 @@
-// this page runs inside the job page itself.
-// meaning it has access to -----> document ,window.location.href ,Page DOM elements
-
-// Its only responsibility is to 
-// Extract job details from whichever job site you are visiting, and send them
-// back to the popup.console.log("Content script loaded on:", window.location.href);
-
 console.log("Content script loaded on:", window.location.href);
 
-// well this our main scraping function 
-// we initialize an job objext with empty fields and every site specific
-// block will find them
+const normalizeText = (value) => (value || "").replace(/\s+/g, " ").trim();
+
+const isInvalidValue = (value) => {
+	const normalized = normalizeText(value).toLowerCase();
+	if (!normalized) return true;
+	if (["indeed", "job title", "unknown", "unknown company", "not specified", "n/a"].includes(normalized)) {
+		return true;
+	}
+	return /(company:|industry:|employment type:|location:|experience:|job description:)/i.test(normalized);
+};
+
+const extractFromDescription = (description) => {
+	if (!description) return { title: "", company: "", location: "", salary: "" };
+	const inlineLabels = [
+		"Job\\s*Title",
+		"Company",
+		"Company\\s+Name",
+		"Company\\s+Location",
+		"Employer",
+		"Work\\s+Location",
+		"Candidate\\s+Work\\s+Location",
+		"Location",
+		"Pay",
+		"Salary",
+		"Compensation",
+		"Experience",
+		"Job\\s+Description",
+	];
+	const boundary = inlineLabels.join("|");
+	const inline = (label) => {
+		const pattern = new RegExp(`${label}\\s*:?\\s*([^\\n]+?)(?=\\s+(?:${boundary})\\s*:?|$)`, "i");
+		const match = description.match(pattern);
+		return match?.[1] ? normalizeText(match[1]) : "";
+	};
+
+	const line = (pattern, groupIndex = 1) => {
+		const match = description.match(pattern);
+		return match?.[groupIndex] ? normalizeText(match[groupIndex]) : "";
+	};
+
+	const title = line(/^\s*Job\s*Title\s*:?\s*(.+)$/im) || inline("Job\\s*Title");
+	const company = line(/^(?!\s*Company\s+Location\s*:)(?:\s*Company\s*:?|\s*Company\s+Name\s*:|\s*Employer\s*:)(.+)$/im) || inline("Company|Company\\s+Name|Employer");
+	const location = line(/^(?!\s*Company\s+Location\s*:)(?:\s*Work\s+Location|\s*Candidate\s+Work\s+Location|\s*Location)\s*:?\s*(.+)$/im) || inline("Work\\s+Location|Candidate\\s+Work\\s+Location|Location");
+	const salary = line(/^\s*(Pay|Salary|Compensation)\s*:\s*(.+)$/im, 2) || inline("Pay|Salary|Compensation");
+
+	return { title, company, location, salary };
+};
+
+const extractFromInlineText = (text) => {
+	if (!text) return { title: "", company: "", location: "", salary: "" };
+	const labels = [
+		"Job\\s*Title",
+		"Company",
+		"Company\\s+Name",
+		"Company\\s+Location",
+		"Employer",
+		"Location",
+		"Industry",
+		"Employment\\s+Type",
+		"Experience",
+	];
+	const boundary = labels.join("|");
+	const pick = (label) => {
+		const pattern = new RegExp(`${label}\\s*:?\\s*([^\n]+?)(?=\\s+(?:${boundary})\\s*:?|$)`, "i");
+		const match = text.match(pattern);
+		return match?.[1] ? normalizeText(match[1]) : "";
+	};
+
+	const title = pick("Job\\s*Title") || normalizeText(text.split(/\bCompany\s*:/i)[0]);
+	const company = pick("Company|Company\\s+Name|Employer");
+	const location = pick("Location");
+	return { title: normalizeText(title), company, location, salary: "" };
+};
+
 function extractJobDetails() {
-  let job = {
-    title: "",
-    company: "",
-    location: "",
-    salary: "",
-    description: "",
-    url: window.location.href
-  };
+	const job = {
+		title: "",
+		company: "",
+		location: "",
+		salary: "",
+		description: "",
+		url: window.location.href,
+	};
 
-  // well everyone is smart here to understand here what is happeing 
-  // if not go to sleep
-  if (location.href.includes("internshala.com")) {
-    job.title = document.querySelector(".heading_4_5")?.innerText || document.querySelector("h1")?.innerText || "";
-    job.company = document.querySelector(".company_name")?.innerText || document.querySelector(".heading_4_5")?.parentElement?.querySelector("a")?.innerText || "";
-    job.location = document.querySelector(".location_link")?.innerText || "";
-    job.salary = document.querySelector(".heading_4")?.innerText || "";
-    job.description = document.querySelector(".job_description")?.innerText || document.querySelector("#job_description")?.innerText || "";
-  }
+	const bySelector = (selector) => normalizeText(document.querySelector(selector)?.innerText || "");
 
-  if (location.href.includes("indeed.com")) {
-    // Log all h1 and h2 elements found
-    const allH1s = Array.from(document.querySelectorAll("h1, h2, [role='heading']"));
-    console.log("🔍 All heading elements found:", allH1s.map(h => ({ tag: h.tagName, text: h.innerText, classes: h.className })));
-    
-    // Try to find title from various sources
-    const titleElement = document.querySelector("h1") ||
-                         document.querySelector("h2[class*='title']") ||
-                         document.querySelector("[data-testid*='title']") ||
-                         document.querySelector(".jobTitle");
-    
-    job.title = titleElement?.innerText?.trim() || "";
-    console.log("📌 Found title element:", titleElement?.innerText, "| Classes:", titleElement?.className);
-    
-    // Company extraction - look for company name link or text
-    const companyElement = document.querySelector("[data-testid='companyPartialName']") ||
-                          document.querySelector("a[href*='companies/']") ||
-                          document.querySelector(".css-87uc0g") ||
-                          document.querySelector("[class*='company']");
-    
-    job.company = companyElement?.innerText?.trim() || "";
-    console.log("🏢 Found company element:", companyElement?.innerText, "| Classes:", companyElement?.className);
-    
-    // Location
-    job.location = document.querySelector("[data-testid='jobLocation']")?.innerText?.trim() ||
-                   document.querySelector(".jobLocation")?.innerText?.trim() || "";
-    console.log("📍 Found location:", job.location);
-    
-    // Salary - check multiple sources
-    const salaryElement = document.querySelector("[data-testid='salary-snippet']") ||
-                         document.querySelector(".salary-snippet-container") ||
-                         document.querySelector(".css-1rhg65m");
-    
-    job.salary = salaryElement?.innerText?.trim() || "";
-    console.log("💰 Found salary:", job.salary);
-    
-    // Description - most important for Groq fallback
-    const descElement = document.querySelector("#jobDescriptionText") ||
-                       document.querySelector(".jobsearch-RichTextSnippet") ||
-                       document.querySelector("[data-testid='jobDetailSection']");
-    
-    job.description = descElement?.innerText?.trim() || "";
-    console.log("📝 Found description length:", job.description?.length || 0);
-  }
+	if (location.href.includes("indeed.com")) {
+		const detailRoot = document.querySelector("#jobsearch-ViewJob") ||
+			document.querySelector("[data-testid='jobDetailSection']") ||
+			document;
 
-  if (location.href.includes("linkedin.com/jobs")) {
-    job.title = document.querySelector(".top-card-layout__title")?.innerText || "";
-    job.company = document.querySelector(".topcard__org-name-link")?.innerText || "";
-    job.location = document.querySelector(".topcard__flavor--bullet")?.innerText || "";
-    job.description = document.querySelector(".description__text")?.innerText || "";
-  }
+		const byRoot = (selector) => normalizeText(detailRoot.querySelector(selector)?.innerText || "");
 
-  if (location.href.includes("glassdoor.com")) {
-    job.title = document.querySelector("h1")?.innerText || "";
-    job.company = document.querySelector(".css-16nw49e")?.innerText || "";
-    job.location = document.querySelector(".css-56kyx5")?.innerText || "";
-    job.description = document.querySelector(".jobDescriptionContent")?.innerText || "";
-  }
+		job.title = byRoot("[data-testid='jobsearch-JobInfoHeader-title']") || byRoot("h1") || byRoot("[data-testid*='title']") || byRoot(".jobTitle");
+		job.company = byRoot("[data-testid='company-name']") || byRoot("[data-testid='companyPartialName']") || byRoot(".jobsearch-CompanyInfoWithoutHeaderImage a") || byRoot("a[href*='companies/']");
+		job.location = byRoot("[data-testid='job-location']") || byRoot("[data-testid='jobLocation']") || byRoot(".jobLocation");
+		job.salary = byRoot("[data-testid='salaryInfoAndJobType']") || byRoot("[data-testid='salary-snippet']") || byRoot(".salary-snippet-container");
+		job.description = byRoot("#jobDescriptionText") || byRoot("[data-testid='jobDescriptionText']") || byRoot(".jobsearch-RichTextSnippet") || byRoot("[data-testid='jobDetailSection']");
 
-  if (location.href.includes("naukri.com")) {
-    job.title = document.querySelector("h1.jd-header-title")?.innerText || "";
-    job.company = document.querySelector(".jd-header-comp-name")?.innerText || "";
-    job.location = document.querySelector(".jd-header-location")?.innerText || "";
-    job.description = document.querySelector(".dang-inner-html")?.innerText || "";
-  }
+		const subtitleText = normalizeText(detailRoot.querySelector(".jobsearch-JobInfoHeader-subtitle")?.innerText || "");
+		if (subtitleText) {
+			const parts = subtitleText.split("\n").map((part) => normalizeText(part)).filter(Boolean);
+			if (!job.company && parts[0]) job.company = parts[0];
+			if (!job.location && parts[1]) job.location = parts[1];
+		}
 
-  if (location.href.includes("monster.com")) {
-    job.title = document.querySelector("h1[data-testid='svx-job-title']")?.innerText || document.querySelector("h1.title")?.innerText || "";
-    job.company = document.querySelector("[data-testid='svx-jobview-company-name']")?.innerText || document.querySelector(".company")?.innerText || "";
-    job.location = document.querySelector("[data-testid='svx-jobview-location']")?.innerText || document.querySelector(".location")?.innerText || "";
-    job.salary = document.querySelector("[data-testid='svx-jobview-salary']")?.innerText || "";
-    job.description = document.querySelector("[data-testid='svx-job-description-text']")?.innerText || document.querySelector(".job-description")?.innerText || "";
-  }
+		const selectedCard = document.querySelector("a[aria-selected='true']") ||
+			document.querySelector(".tapItem[aria-current='true']") ||
+			document.querySelector(".job_seen_beacon[aria-selected='true']");
 
-  if (location.href.includes("ziprecruiter.com")) {
-    job.title = document.querySelector("h1.job_title")?.innerText || document.querySelector("h1")?.innerText || "";
-    job.company = document.querySelector("[itemprop='name']")?.innerText || document.querySelector(".hiring_company_text")?.innerText || "";
-    job.location = document.querySelector("[itemprop='addressLocality']")?.innerText || document.querySelector(".location")?.innerText || "";
-    job.salary = document.querySelector(".salary_range")?.innerText || "";
-    job.description = document.querySelector(".job_description")?.innerText || document.querySelector(".jobDescriptionSection")?.innerText || "";
-  }
+		if (selectedCard) {
+			const cardTitle = normalizeText(selectedCard.querySelector("[data-testid='jobTitle']")?.innerText || selectedCard.querySelector(".jobTitle")?.innerText || "");
+			const cardCompany = normalizeText(selectedCard.querySelector(".companyName")?.innerText || "");
+			const cardLocation = normalizeText(selectedCard.querySelector(".companyLocation")?.innerText || "");
 
-  if (location.href.includes("dice.com")) {
-    job.title = document.querySelector("h1[data-cy='jobTitle']")?.innerText || document.querySelector("h1.jobTitle")?.innerText || "";
-    job.company = document.querySelector("[data-cy='companyName']")?.innerText || document.querySelector(".employer")?.innerText || "";
-    job.location = document.querySelector("[data-cy='locationDetails']")?.innerText || document.querySelector(".location")?.innerText || "";
-    job.salary = document.querySelector(".salary")?.innerText || "";
-    job.description = document.querySelector("[data-cy='jobDescription']")?.innerText || document.querySelector(".job-description")?.innerText || "";
-  }
+			if (cardTitle && isInvalidValue(job.title)) job.title = cardTitle;
+			if (cardCompany && (isInvalidValue(job.company) || cardCompany.toLowerCase() !== job.company.toLowerCase())) {
+				job.company = cardCompany;
+			}
+			if (cardLocation && isInvalidValue(job.location)) job.location = cardLocation;
+		}
 
-  if (location.href.includes("simplyhired.com")) {
-    job.title = document.querySelector("h1.viewjob-jobTitle")?.innerText || document.querySelector("h1")?.innerText || "";
-    job.company = document.querySelector(".viewjob-companyName")?.innerText || document.querySelector(".company")?.innerText || "";
-    job.location = document.querySelector(".viewjob-location")?.innerText || document.querySelector(".location")?.innerText || "";
-    job.salary = document.querySelector(".viewjob-salary")?.innerText || "";
-    job.description = document.querySelector(".viewjob-description")?.innerText || document.querySelector(".job-description")?.innerText || "";
-  }
+		if (isInvalidValue(job.title) || isInvalidValue(job.company) || isInvalidValue(job.location)) {
+			const inlineDerived = extractFromInlineText(job.title);
+			if (isInvalidValue(job.title) && inlineDerived.title) job.title = inlineDerived.title;
+			if (isInvalidValue(job.company) && inlineDerived.company) job.company = inlineDerived.company;
+			if (isInvalidValue(job.location) && inlineDerived.location) job.location = inlineDerived.location;
+		}
 
-  if (location.href.includes("careerbuilder.com")) {
-    job.title = document.querySelector("h1[data-testid='job-title']")?.innerText || document.querySelector(".job-title")?.innerText || "";
-    job.company = document.querySelector("[data-testid='company-name']")?.innerText || document.querySelector(".company-name")?.innerText || "";
-    job.location = document.querySelector("[data-testid='job-location']")?.innerText || document.querySelector(".job-location")?.innerText || "";
-    job.salary = document.querySelector("[data-testid='compensation']")?.innerText || "";
-    job.description = document.querySelector("[data-testid='job-description']")?.innerText || document.querySelector(".job-description")?.innerText || "";
-  }
+		if (isInvalidValue(job.title)) job.title = "";
+		if (isInvalidValue(job.company)) job.company = "";
+		if (isInvalidValue(job.location)) job.location = "";
+	} else if (location.href.includes("internshala.com")) {
+		job.title = bySelector(".heading_4_5") || bySelector("h1");
+		job.company = bySelector(".company_name") || bySelector(".heading_4_5") || "";
+		job.location = bySelector(".location_link");
+		job.salary = bySelector(".heading_4");
+		job.description = bySelector(".job_description") || bySelector("#job_description");
+	} else if (location.href.includes("linkedin.com/jobs")) {
+		job.title = bySelector(".top-card-layout__title") || bySelector("h1");
+		job.company = bySelector(".topcard__org-name-link") || bySelector(".topcard__flavor");
+		job.location = bySelector(".topcard__flavor--bullet") || bySelector(".jobs-unified-top-card__bullet");
+		job.description = bySelector(".description__text") || bySelector(".jobs-description__content");
+	} else if (location.href.includes("glassdoor.com")) {
+		job.title = bySelector("h1") || bySelector("[data-test='jobTitle']");
+		job.company = bySelector(".css-16nw49e") || bySelector("[data-test='employerName']");
+		job.location = bySelector(".css-56kyx5") || bySelector("[data-test='location']");
+		job.description = bySelector(".jobDescriptionContent");
+	} else if (location.href.includes("naukri.com")) {
+		job.title = bySelector("h1.jd-header-title") || bySelector("h1");
+		job.company = bySelector(".jd-header-comp-name") || bySelector(".companyInfo");
+		job.location = bySelector(".jd-header-location") || bySelector(".loc");
+		job.description = bySelector(".dang-inner-html") || bySelector(".job-desc");
+	} else {
+		job.title = bySelector("h1");
+		job.description = bySelector("#jobDescriptionText") || bySelector("[data-testid='jobDescriptionText']") || "";
+	}
 
-  if (location.href.includes("angels.co") || location.href.includes("wellfound.com")) {
-    job.title = document.querySelector("h1[data-test='JobDetail-title']")?.innerText || document.querySelector("h1")?.innerText || "";
-    job.company = document.querySelector("[data-test='StartupLink-title']")?.innerText || document.querySelector(".company-name")?.innerText || "";
-    job.location = document.querySelector("[data-test='JobDetail-location']")?.innerText || document.querySelector(".location")?.innerText || "";
-    job.salary = document.querySelector("[data-test='JobDetail-salary']")?.innerText || "";
-    job.description = document.querySelector("[data-test='JobDetail-description']")?.innerText || document.querySelector(".job-description")?.innerText || "";
-  }
+	if (job.description) {
+		const derived = extractFromDescription(job.description);
+		if (!job.title) job.title = derived.title;
+		if (!job.company || (derived.company && derived.company.toLowerCase() !== job.company.toLowerCase())) {
+			job.company = derived.company || job.company;
+		}
+		if (!job.location) job.location = derived.location;
+		if (!job.salary) job.salary = derived.salary;
+	}
 
-  return job;
+	return job;
 }
 
-
-// At last we are sending data back to the popUp.js file
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  if (msg.action === "extract_job") {
-    try {
-      const jobData = extractJobDetails();
-      console.log("Job data extracted:", jobData);
-      sendResponse({ success: true, data: jobData });
-    }
-    catch (error) {
-      console.error("Error extracting job:", error);
-      sendResponse({ success: false, error: error.message });
-    }
-  }
-  return true; // Required for async sendResponse
+	if (msg.action === "extract_job") {
+		try {
+			const jobData = extractJobDetails();
+			console.log("Job data extracted:", jobData);
+			sendResponse({ success: true, data: jobData });
+		} catch (error) {
+			console.error("Error extracting job:", error);
+			sendResponse({ success: false, error: error.message });
+		}
+	}
+	return true;
 });

@@ -969,7 +969,38 @@
 
 .app-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.delete-btn {
+  background: white;
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.delete-btn:hover {
+  background: rgba(239, 68, 68, 0.08);
+  box-shadow: 0 8px 16px rgba(239, 68, 68, 0.18);
+  transform: translateY(-1px);
+}
+
+.delete-btn:focus-visible {
+  outline: 2px solid rgba(239, 68, 68, 0.6);
+  outline-offset: 2px;
+}
+
+.delete-icon {
+  width: 18px;
+  height: 18px;
 }
 
 .action-btn {

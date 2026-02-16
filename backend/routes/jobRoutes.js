@@ -1,7 +1,7 @@
 import express from "express"
 import { prisma } from "../config/db.js"
 import { verifyToken } from "../middleware/auth.js"
-import { extractJobDetails } from "../utils/extractJobDetails.js"
+import { extractJobDetails, cleanDescriptionText } from "../utils/extractJobDetails.js"
 
 const router = express.Router();
 
@@ -39,7 +39,7 @@ router.post("/save", verifyToken, async (req, res) => {
             return res.status(400).json({ message: "URL is required" });
         }
 
-        // Sanitize incoming data (but we'll let Groq extract from description anyway)
+        // Sanitize incoming data and use it as primary source
         let cleanData = sanitizeJobData({
             title,
             company,
@@ -48,22 +48,21 @@ router.post("/save", verifyToken, async (req, res) => {
         });
         console.log("🧹 Sanitized incoming data:", cleanData);
 
-        // Always extract from description using Groq LLM - description has all the info
+        // Extract from description as fallback and improvements
         if (description) {
-            console.log("🔍 Starting Groq extraction from description...");
-            // Pass empty object to force Groq to extract everything from description
-            const extracted = await extractJobDetails(description, {});
-            console.log("✅ Groq extraction complete, result:", extracted);
+            console.log("🔍 Starting extraction from description...");
+            const extracted = await extractJobDetails(description, cleanData);
+            console.log("✅ Extraction complete, result:", extracted);
             
             // Sanitize extracted data
             const sanitizedExtracted = sanitizeJobData(extracted);
 
-            // Use Groq-extracted values (they're more accurate from full description)
-            // Only use provided values as final fallback
-            cleanData.title = sanitizedExtracted.title || cleanData.title;
-            cleanData.company = sanitizedExtracted.company || cleanData.company;
-            cleanData.location = sanitizedExtracted.location || cleanData.location;
-            cleanData.salary = sanitizedExtracted.salary || cleanData.salary;
+            cleanData = {
+                title: sanitizedExtracted.title || cleanData.title,
+                company: sanitizedExtracted.company || cleanData.company,
+                location: sanitizedExtracted.location || cleanData.location,
+                salary: sanitizedExtracted.salary || cleanData.salary,
+            };
         }
 
         // Final fallbacks with defaults
@@ -79,6 +78,8 @@ router.post("/save", verifyToken, async (req, res) => {
         const now = new Date();
         console.log("💾 Saving job to database at", now.toISOString());
 
+        const cleanedDescription = cleanDescriptionText(description || "");
+
         const savedJob = await prisma.job.create({
             data: {
                 userId: req.userId,
@@ -86,7 +87,7 @@ router.post("/save", verifyToken, async (req, res) => {
                 company: finalData.company,
                 location: finalData.location,
                 salary: finalData.salary,
-                description: description || "",
+                description: cleanedDescription,
                 url,
                 status: status || "saved",
                 appliedDate: new Date()
@@ -119,10 +120,22 @@ router.get("/", verifyToken, async (req, res) => {
             where: { userId: req.userId },
             orderBy: { savedAt: "desc" }
         });
+        const cleanedJobs = await Promise.all(
+            jobs.map(async (job) => {
+                const cleanedDescription = cleanDescriptionText(job.description || "");
+                if (cleanedDescription && cleanedDescription !== job.description) {
+                    return prisma.job.update({
+                        where: { id: job.id },
+                        data: { description: cleanedDescription }
+                    });
+                }
+                return job;
+            })
+        );
         res.json({
             message: "Jobs retrieved successfully",
-            count: jobs.length,
-            jobs
+            count: cleanedJobs.length,
+            jobs: cleanedJobs
         });
     } catch (error) {
         console.error("Error fetching jobs:", error);
@@ -137,10 +150,22 @@ router.get("/status/:status", verifyToken, async (req, res) => {
             where: { userId: req.userId, status: req.params.status },
             orderBy: { savedAt: "desc" }
         });
+        const cleanedJobs = await Promise.all(
+            jobs.map(async (job) => {
+                const cleanedDescription = cleanDescriptionText(job.description || "");
+                if (cleanedDescription && cleanedDescription !== job.description) {
+                    return prisma.job.update({
+                        where: { id: job.id },
+                        data: { description: cleanedDescription }
+                    });
+                }
+                return job;
+            })
+        );
         res.json({
             message: `${req.params.status} jobs retrieved successfully`,
-            count: jobs.length,
-            jobs
+            count: cleanedJobs.length,
+            jobs: cleanedJobs
         });
     } catch (error) {
         console.error("Error fetching jobs:", error);
@@ -158,10 +183,18 @@ router.get("/:id", verifyToken, async (req, res) => {
         if (!job) {
             return res.status(404).json({ message: "Job not found" });
         }
+
+        const cleanedDescription = cleanDescriptionText(job.description || "");
+        const updatedJob = (cleanedDescription && cleanedDescription !== job.description)
+            ? await prisma.job.update({
+                where: { id: job.id },
+                data: { description: cleanedDescription }
+            })
+            : job;
         
         res.json({
             message: "Job retrieved successfully",
-            job
+            job: updatedJob
         });
     } catch (error) {
         console.error("Error fetching job:", error);
